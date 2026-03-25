@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
+            ActivitySeeder::class,
             ContactSeeder::class,
             OpportunitySeeder::class,
             AddressSeeder::class,

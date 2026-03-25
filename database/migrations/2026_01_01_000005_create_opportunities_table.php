@@ -21,12 +21,12 @@ return new class extends Migration
                 'negotiation',
                 'closed_won',
                 'closed_lost',
-            ]);
+            ])->default('qualification');
             $table->enum('type', [
                 'new_business',
                 'upsell',
                 'renewal',
-            ]);
+            ])->default('new_business');
             $table->decimal('amount', 15, 2)->nullable();
             $table->dateTime('closed_date');
             $table->foreignId('client_id')->constrained('clients', 'id_client')->cascadeOnDelete();

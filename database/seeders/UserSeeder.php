@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
         if ($salesRole) {
             foreach (range(1, 5) as $index) {
                 User::create([
-                    'username' => fake()->name(),
+                    'name' => fake()->name(),
                     'email' => fake()->unique()->safeEmail(),
                     'password' => Hash::make('password'),
                     'role_id' => $salesRole->id_role,

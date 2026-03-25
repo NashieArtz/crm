@@ -26,7 +26,7 @@ class ClientSeeder extends Seeder
         foreach (range(1, 20) as $index) {
             $companyName = fake()->company();
 
-            Client::updateOrCreate(
+            $client = Client::updateOrCreate(
                 ['email' => fake()->unique()->companyEmail()],
                 [
                     'company_name' => $companyName,
@@ -35,6 +35,14 @@ class ClientSeeder extends Seeder
                     'created_at' => fake()->dateTimeBetween('-6 months', 'now'),
                 ]
             );
+
+            $randomUserIds = User::inRandomOrder()
+                ->take(rand(1, 2))
+                ->pluck('id_user')
+                ->toArray();
+
+            $client->users()->syncWithoutDetaching($randomUserIds);
+
         }
     }
 }
