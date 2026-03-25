@@ -19,7 +19,7 @@ return new class extends Migration
                 'meeting',
                 'task',
                 'note',
-            ]);
+            ])->nullable();
             $table->text('description')->nullable();
             $table->dateTime('date_activity');
             $table->timestamps();

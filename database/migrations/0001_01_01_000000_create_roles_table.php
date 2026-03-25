@@ -17,7 +17,7 @@ return new class extends Migration
                 'admin',
                 'manager',
                 'sales_rep',
-            ]);
+            ])->default('sales_rep');
             $table->timestamps();
         });
     }

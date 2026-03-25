@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Activity;
+use App\Models\Client;
 use Illuminate\Database\Seeder;
 
 class ActivitySeeder extends Seeder
@@ -12,6 +13,7 @@ class ActivitySeeder extends Seeder
      */
     public function run(): void
     {
+
         $activities = [
             ['type' => 'call'],
             ['type' => 'email'],
@@ -20,13 +22,19 @@ class ActivitySeeder extends Seeder
             ['type' => 'note'],
         ];
 
-        foreach ($activities as $activity) {
-            Activity::updateOrCreate(
-                ['type' => $activity['type']],
+        foreach ($activities as $activityIndex) {
+            $activity = Activity::updateOrCreate(
+                ['type' => $activityIndex['type']],
                 ['description' => fake()->sentence(10),
                     'date_activity' => fake()->dateTimeBetween('-1 month', '+1 month'),
                 ]
             );
+
+            $randomClients = Client::inRandomOrder()
+                ->take(rand(1, 3))
+                ->pluck('id_client')
+                ->toArray();
+            $activity->clients()->syncWithoutDetaching($randomClients);
         }
     }
 }

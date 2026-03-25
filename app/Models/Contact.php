@@ -21,7 +21,7 @@ class Contact extends Model
         'phone',
         'type',
         'description',
-        'client_id'
+        'client_id',
     ];
 
     public function client(): BelongsTo

@@ -22,7 +22,7 @@ return new class extends Migration
                 'prospect',
                 'customer',
                 'partner',
-            ]);
+            ])->nullable();
             $table->text('description')->nullable();
             $table->foreignId('client_id')->constrained('clients', 'id_client')->cascadeOnDelete();
             $table->timestamps();
