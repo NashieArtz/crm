@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@biscuit.fr'],
             [
-                'username' => 'Admin Biscuit',
+                'name' => 'Admin Biscuit',
                 'password' => Hash::make('password'),
                 'role_id' => $adminRole->id_role,
             ]
