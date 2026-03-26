@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Blade;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        Blade::directive('convert', function ($money) {
+            return "<?php echo number_format($money, 2, '€'); ?>";
+        });
     }
 
     /**
