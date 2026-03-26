@@ -22,6 +22,7 @@ class ClientFactory extends Factory
             'email' => fake()->unique()->companyEmail(),
             'phone' => fake()->phoneNumber(),
             'website' => 'https://'.fake()->domainName(),
+            'income' => fake()->randomFloat(2, 0, 100000),
         ];
     }
 }
