@@ -24,6 +24,7 @@ class Client extends Model
         'email',
         'phone',
         'website',
+        'income',
     ];
 
     // RELATIONS
