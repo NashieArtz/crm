@@ -1,7 +1,7 @@
 'use client';
 
 import { TrendingUp } from 'lucide-react';
-import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
+import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 
 import {
     Card,
@@ -18,15 +18,15 @@ import {
     type ChartConfig,
 } from '@/components/ui/chart';
 
-export const description = 'A multiple line chart';
+export const description = 'A simple area chart';
 
 const chartData = [
-    { month: 'January', desktop: 186, mobile: 80 },
-    { month: 'February', desktop: 305, mobile: 200 },
-    { month: 'March', desktop: 237, mobile: 120 },
-    { month: 'April', desktop: 73, mobile: 190 },
-    { month: 'May', desktop: 209, mobile: 130 },
-    { month: 'June', desktop: 214, mobile: 140 },
+    { month: 'January', income: 186 },
+    { month: 'February', desktop: 305 },
+    { month: 'March', desktop: 237 },
+    { month: 'April', desktop: 73 },
+    { month: 'May', desktop: 209 },
+    { month: 'June', desktop: 214 },
 ];
 
 const chartConfig = {
@@ -34,22 +34,20 @@ const chartConfig = {
         label: 'Desktop',
         color: 'var(--chart-1)',
     },
-    mobile: {
-        label: 'Mobile',
-        color: 'var(--chart-2)',
-    },
 } satisfies ChartConfig;
 
-export function ChartRevenue() {
+export function ChartTotalRevenu() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Line Chart - Multiple</CardTitle>
-                <CardDescription>January - June 2024</CardDescription>
+                <CardTitle>Area Chart</CardTitle>
+                <CardDescription>
+                    Showing total visitors for the last 6 months
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
-                    <LineChart
+                    <AreaChart
                         accessibilityLayer
                         data={chartData}
                         margin={{
@@ -67,23 +65,16 @@ export function ChartRevenue() {
                         />
                         <ChartTooltip
                             cursor={false}
-                            content={<ChartTooltipContent />}
+                            content={<ChartTooltipContent indicator="line" />}
                         />
-                        <Line
+                        <Area
                             dataKey="desktop"
-                            type="monotone"
+                            type="natural"
+                            fill="var(--color-desktop)"
+                            fillOpacity={0.4}
                             stroke="var(--color-desktop)"
-                            strokeWidth={2}
-                            dot={false}
                         />
-                        <Line
-                            dataKey="mobile"
-                            type="monotone"
-                            stroke="var(--color-mobile)"
-                            strokeWidth={2}
-                            dot={false}
-                        />
-                    </LineChart>
+                    </AreaChart>
                 </ChartContainer>
             </CardContent>
             <CardFooter>
@@ -94,7 +85,7 @@ export function ChartRevenue() {
                             <TrendingUp className="h-4 w-4" />
                         </div>
                         <div className="flex items-center gap-2 leading-none text-muted-foreground">
-                            Showing total visitors for the last 6 months
+                            January - June 2024
                         </div>
                     </div>
                 </div>

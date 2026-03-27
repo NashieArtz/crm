@@ -11,10 +11,8 @@ Route::inertia('/', 'welcome', [
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 });
-
 // Créer un client
 Route::get('/client/create', [RessourceController::class, 'index']) ->name('client.index');
 Route::post('client/create', [RessourceController::class, 'create']) ->name('client.create');
 
-require __DIR__.'/settings.php';
-
+require __DIR__ . '/settings.php';
