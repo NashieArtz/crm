@@ -158,7 +158,7 @@ class DashboardController extends Controller
         $latestActivities = Activity::latest()->limit(10)->get();
 
         // Envoi des données vers dashboard
-        return Inertia::render('dashboard', [
+        return Inertia::render('chart-dashboard', [
             'totalClient' => $totalClient,
             'totalOpportunities' => $totalOpportunities,
 
