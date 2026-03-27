@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OpportunityController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -13,8 +14,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
 });
 
+// CRUD
 Route::middleware(['auth'])->group(function () {
     Route::resource('clients', ClientController::class)->except(['create', 'edit']);
+    Route::resource('opportunities', OpportunityController::class)->except(['create', 'edit', 'show']);
 });
+
+//
 
 require __DIR__.'/settings.php';
