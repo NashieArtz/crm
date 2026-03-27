@@ -1,7 +1,4 @@
 import { Form } from '@inertiajs/react';
-import InputError from './input-error';
-import PasswordInput from './password-input';
-import TextLink from './text-link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -9,13 +6,16 @@ import {
     FieldDescription,
     FieldGroup,
     FieldLabel,
-    FieldSeparator,
+
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
+import InputError from './input-error';
+import PasswordInput from './password-input';
+import TextLink from './text-link';
 
 type Props = {
     status?: string;
