@@ -1,0 +1,17 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- softer, smoother outer shape -->
+  <path d="
+    M100 24
+    C118 52 132 72 132 96
+    C132 112 124 122 110 130
+    C134 140 148 156 148 176
+    C148 192 136 200 118 200
+    C90 200 68 178 68 144
+    C68 118 78 100 94 86
+    C108 74 114 58 100 24
+    Z
+  " fill="currentColor"/>
+
+  <!-- slightly softer positioned circle -->
+  <circle cx="110" cy="168" r="16" fill="white"/>
+</svg>
