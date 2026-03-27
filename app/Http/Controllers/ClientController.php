@@ -23,15 +23,6 @@ class ClientController extends Controller
         ]);
     }
 
-    //<editor-fold desc="Description">
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-    //</editor-fold>
 
     /**
      * Store a newly created resource in storage.
@@ -55,14 +46,6 @@ class ClientController extends Controller
         return Inertia::render('Client/Show', [
             'client' => $client
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-
     }
 
     /**
