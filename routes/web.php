@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\RessourceController;
+use App\Http\Controllers\ClientController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -13,8 +13,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Créer un client
-Route::get('/client/create', [RessourceController::class, 'index']) ->name('client.index');
-Route::post('client/create', [RessourceController::class, 'create']) ->name('client.create');
+// Middleware protect route from unlogged users
+Route::middleware(['auth'])->group(function () {
+    Route::resource('clients', ClientController::class)->except(['create', 'edit']);
+});
 
 require __DIR__.'/settings.php';
-
