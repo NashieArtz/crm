@@ -1,7 +1,8 @@
 'use client';
 
+import DashboardController from '@/actions/App/Http/Controllers/DashBoardController';
 import { TrendingUp } from 'lucide-react';
-import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
 
 import {
     Card,
@@ -15,19 +16,20 @@ import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
-    type ChartConfig,
 } from '@/components/ui/chart';
-
-export const description = 'A simple area chart';
+import type { ChartConfig } from '@/components/ui/chart';
+export const description = 'A line chart';
 
 const chartData = [
-    { month: 'January', income: 186 },
+    { month: 'January', desktop: 186 },
     { month: 'February', desktop: 305 },
     { month: 'March', desktop: 237 },
     { month: 'April', desktop: 73 },
     { month: 'May', desktop: 209 },
     { month: 'June', desktop: 214 },
 ];
+
+DashboardController();
 
 const chartConfig = {
     desktop: {
@@ -36,18 +38,16 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function ChartTotalRevenu() {
+export function ChartLineDefault() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Area Chart</CardTitle>
-                <CardDescription>
-                    Showing total visitors for the last 6 months
-                </CardDescription>
+                <CardTitle>Line Chart</CardTitle>
+                <CardDescription>January - June 2024</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
-                    <AreaChart
+                    <LineChart
                         accessibilityLayer
                         data={chartData}
                         margin={{
@@ -65,29 +65,25 @@ export function ChartTotalRevenu() {
                         />
                         <ChartTooltip
                             cursor={false}
-                            content={<ChartTooltipContent indicator="line" />}
+                            content={<ChartTooltipContent hideLabel />}
                         />
-                        <Area
+                        <Line
                             dataKey="desktop"
                             type="natural"
-                            fill="var(--color-desktop)"
-                            fillOpacity={0.4}
                             stroke="var(--color-desktop)"
+                            strokeWidth={2}
+                            dot={false}
                         />
-                    </AreaChart>
+                    </LineChart>
                 </ChartContainer>
             </CardContent>
-            <CardFooter>
-                <div className="flex w-full items-start gap-2 text-sm">
-                    <div className="grid gap-2">
-                        <div className="flex items-center gap-2 leading-none font-medium">
-                            Trending up by 5.2% this month{' '}
-                            <TrendingUp className="h-4 w-4" />
-                        </div>
-                        <div className="flex items-center gap-2 leading-none text-muted-foreground">
-                            January - June 2024
-                        </div>
-                    </div>
+            <CardFooter className="flex-col items-start gap-2 text-sm">
+                <div className="flex gap-2 leading-none font-medium">
+                    Trending up by 5.2% this month{' '}
+                    <TrendingUp className="h-4 w-4" />
+                </div>
+                <div className="leading-none text-muted-foreground">
+                    Showing total visitors for the last 6 months
                 </div>
             </CardFooter>
         </Card>
