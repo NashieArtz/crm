@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
 use App\Http\Requests\ClientRequest;
+use App\Models\Client;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,10 +19,9 @@ class ClientController extends Controller
         $clients = Client::latest()->get();
 
         return Inertia::render('Client/Index', [
-            'clients' => $clients
+            'clients' => $clients,
         ]);
     }
-
 
     /**
      * Store a newly created resource in storage.
@@ -44,7 +43,7 @@ class ClientController extends Controller
         $client->load(['contacts', 'opportunities', 'activities']);
 
         return Inertia::render('Client/Show', [
-            'client' => $client
+            'client' => $client,
         ]);
     }
 
@@ -54,6 +53,7 @@ class ClientController extends Controller
     public function update(ClientRequest $request, Client $client): RedirectResponse
     {
         $client->update($request->validated());
+
         return redirect()->route('clients.index')->with('success', 'Client updated successfully.');
     }
 

@@ -30,14 +30,19 @@ class ClientRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', Rule::unique('clients', 'email')->ignore($clientId, 'id_client')],
             'phone' => ['nullable', 'string', 'max:255'],
             'website' => ['nullable', 'string', 'max:500'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'website' => ['nullable', 'string', 'max:500'],
+            'website' => ['nullable', 'string', 'max:500'],
             'income' => ['nullable', 'integer', 'min:0'],
         ];
     }
 
     // Messages d'erreurs
-    public function messages(): array {
+    public function messages(): array
+    {
         return [
             'company_name.required' => 'The name field is required.',
+            'name.required' => 'The name field is required.',
             'email.required' => 'The email field is required.',
         ];
     }

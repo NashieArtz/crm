@@ -23,11 +23,11 @@ class OpportunityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'source' => ['nullable', 'string', 'max:150'],
-            'details' => ['nullable', 'string'],
-            'status' => ['required', 'in:qualification,proposal,negotiation,closed_won,closed_lost'],
-            'type' => ['required', 'in:new_business,upsell,renewal'],
-            'amount' => ['nullable', 'numeric', 'min:0'],
+            'source' => ['required', 'string', 'max:150'],
+            'details' => ['required', 'string'],
+            'status' => ['required', 'in:qualification, proposal, negotiation, closed_won, closed_lost'],
+            'type' => ['required', 'in:new_business, upsell, renewal'],
+            'amount' => ['required', 'numeric', 'min:0'],
             'closed_date' => ['required', 'date', 'date_format:Y-m-d'],
             'client_id' => ['required', 'exists:clients,id_client'],
         ];
