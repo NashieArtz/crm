@@ -19,14 +19,10 @@ class ClientController extends Controller
         $clients = Client::latest()->get();
 
         return Inertia::render('Client/Index', [
-<<<<<<< HEAD
             'clients' => $clients
         ]);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
     //<editor-fold desc="Description">
     /**
      * Show the form for creating a new resource.
@@ -36,16 +32,6 @@ class ClientController extends Controller
         //
     }
     //</editor-fold>
->>>>>>> bd64d29 (feat: CRUD client)
-=======
->>>>>>> 2be1091 (feat: CRUD client)
-=======
-            'clients' => $clients,
-        ]);
-    }
-
->>>>>>> f2605f16a9741743c9e9c2cb6727c7b3d05c1b61
-
     /**
      * Store a newly created resource in storage.
      */
@@ -66,19 +52,12 @@ class ClientController extends Controller
         $client->load(['contacts', 'opportunities', 'activities']);
 
         return Inertia::render('Client/Show', [
-<<<<<<< HEAD
             'client' => $client
-=======
             'client' => $client,
->>>>>>> f2605f16a9741743c9e9c2cb6727c7b3d05c1b61
         ]);
     }
 
     /**
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
@@ -87,11 +66,6 @@ class ClientController extends Controller
     }
 
     /**
->>>>>>> bd64d29 (feat: CRUD client)
-=======
->>>>>>> 2be1091 (feat: CRUD client)
-=======
->>>>>>> f2605f16a9741743c9e9c2cb6727c7b3d05c1b61
      * Update the specified resource in storage.
      */
     public function update(ClientRequest $request, Client $client): RedirectResponse
