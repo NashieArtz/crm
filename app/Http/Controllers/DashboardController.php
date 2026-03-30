@@ -82,7 +82,7 @@ class DashboardController extends Controller
             ->get();
 
         foreach ($incomeDataWeek as $data) {
-            $weekFormat = 'Sem. '.$data->updated_at->format('W');
+            $weekFormat = $data->updated_at->format('W');
 
             if (! isset($weeklyReport[$weekFormat])) {
                 $weeklyReport[$weekFormat] = [
@@ -105,7 +105,7 @@ class DashboardController extends Controller
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
-        $incomePerDayPerWeek = $incomeDataWeek->map(fn ($item) => [
+        $incomePerDayPerWeek = $incomeDataWeek->map(fn($item) => [
             'day' => date('d/m', strtotime($item->date)),
             'amount' => (float) $item->total,
         ]);
@@ -123,7 +123,7 @@ class DashboardController extends Controller
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
-        $incomePerDayPerMonth = $incomeDataMonth->map(fn ($item) => [
+        $incomePerDayPerMonth = $incomeDataMonth->map(fn($item) => [
             // Format day-Month
             'day' => date('d-M', strtotime($item->date)),
             'amount' => (float) $item->total,
