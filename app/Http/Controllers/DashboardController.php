@@ -82,7 +82,7 @@ class DashboardController extends Controller
             ->get();
 
         foreach ($incomeDataWeek as $data) {
-            $weekFormat = 'Sem. '.$data->updated_at->format('W');
+            $weekFormat = $data->updated_at->format('W');
 
             if (! isset($weeklyReport[$weekFormat])) {
                 $weeklyReport[$weekFormat] = [
