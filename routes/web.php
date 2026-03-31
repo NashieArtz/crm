@@ -32,4 +32,4 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/settings', [AdminController::class, 'index'])->name('admin.settings');
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
