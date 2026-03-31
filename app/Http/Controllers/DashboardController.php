@@ -83,7 +83,7 @@ class DashboardController extends Controller
         $weeklyIncome = [];
 
         // Génération des semaines
-        for ($i = 25; $i >= 0; $i--) {
+        for ($i = 25; $i >= 0; $i--) {  
             $weekDate = now()->subWeeks($i);
             $weekNum = $weekDate->format('W');
             $weeklyIncome[$weekNum] = [
@@ -182,6 +182,7 @@ class DashboardController extends Controller
                 'monthlyIncome' => array_values($monthlyIncome),
                 'weeklyIncome' => array_values($weeklyIncome),
             ],
+
 
             'opportunityPotentialIncome' => $opportunityPotentialIncome,
             'opportunityTotalIncome' => $opportunityTotalIncome,
