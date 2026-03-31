@@ -14,11 +14,7 @@ class ActivityController extends Controller
 {
     public function index(): Response
     {
-<<<<<<< HEAD
         $activities = Activity::with('client:id_client,company_name')->latest('date_activity')->get();
-=======
-        $activities = Activity::with('client:id_client,company_name')->latest('activity_date')->get();
->>>>>>> 477c19892b6baedfaec56ff45237143b238777da
 
         return Inertia::render('Activities/Index', [
             'activities' => $activities,
@@ -27,7 +23,6 @@ class ActivityController extends Controller
 
     public function store(StoreActivityRequest $request): RedirectResponse
     {
-<<<<<<< HEAD
         $activity = Activity::create($request->validated());
 
         // Liaison clients envoyés dans tableau client_ids
@@ -36,37 +31,24 @@ class ActivityController extends Controller
         }
 
         return redirect()->back()->with('success', 'Activity created successfully.');
-=======
-        Activity::create($request->validated());
-
-        return redirect()->back()->with('success', 'Activité créée.');
->>>>>>> 477c19892b6baedfaec56ff45237143b238777da
     }
 
     public function update(UpdateActivityRequest $request, Activity $activity): RedirectResponse
     {
         $activity->update($request->validated());
 
-<<<<<<< HEAD
         // Suppresion anciens, ajout nouveaux clients
         if ($request->has('client_ids')) {
             $activity->clients()->sync($request->client_ids);
         }
 
         return redirect()->back()->with('success', 'Activity updated successfully.');
-=======
-        return redirect()->back()->with('success', 'Activité mise à jour.');
->>>>>>> 477c19892b6baedfaec56ff45237143b238777da
     }
 
     public function destroy(Activity $activity): RedirectResponse
     {
         $activity->delete();
 
-<<<<<<< HEAD
         return redirect()->back()->with('success', 'Activity deleted successfully.');
-=======
-        return redirect()->back()->with('success', 'Activité supprimée.');
->>>>>>> 477c19892b6baedfaec56ff45237143b238777da
     }
 }

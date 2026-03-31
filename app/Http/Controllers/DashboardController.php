@@ -83,7 +83,7 @@ class DashboardController extends Controller
         $weeklyIncome = [];
 
         // Génération des semaines
-        for ($i = 25; $i >= 0; $i--) {
+        for ($i = 25; $i >= 0; $i--) {  
             $weekDate = now()->subWeeks($i);
             $weekNum = $weekDate->format('W');
             $weeklyIncome[$weekNum] = [
@@ -98,17 +98,8 @@ class DashboardController extends Controller
 
         foreach ($incomeDataWeek as $data) {
             $weekFormat = $data->updated_at->format('W');
-<<<<<<< HEAD
             if (isset($weeklyIncome[$weekFormat])) {
                 $weeklyIncome[$weekFormat]['income'] += (float) $data->amount;
-=======
-
-            if (! isset($weeklyIncome[$weekFormat])) {
-                $weeklyIncome[$weekFormat] = [
-                    'label' => $weekFormat,
-                    'income' => 0,
-                ];
->>>>>>> 477c19892b6baedfaec56ff45237143b238777da
             }
         }
         // </editor-fold>
@@ -192,8 +183,6 @@ class DashboardController extends Controller
                 'weeklyIncome' => array_values($weeklyIncome),
             ],
 
-            // 1 to 12 - jan to dec, boucle
-            //
 
             'opportunityPotentialIncome' => $opportunityPotentialIncome,
             'opportunityTotalIncome' => $opportunityTotalIncome,

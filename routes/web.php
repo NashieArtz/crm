@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
@@ -26,6 +27,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('addresses', AddressController::class)->except(['create', 'edit', 'show']);
 });
 
-//
+// Role Management
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/settings', [AdminController::class, 'index'])->name('admin.settings');
+});
 
 require __DIR__ . '/settings.php';
