@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ClientRequest;
 use App\Models\Client;
+use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -100,5 +101,13 @@ class ClientController extends Controller
         $client->users()->attach($request->user_id, ['is_primary' => false]);
 
         return redirect()->back()->with('success', 'Backup user assigned successfully.');
+    }
+
+    public function removeBackup(Request $request, Client $client, User $user): RedirectResponse
+    {
+        // Seul le titulaire peut virer son backup
+        Gate::authorize('update', $client);
+        $client->users()->detach($user->id_user);
+        return redirect()->back()->with('success', 'Backup removed.');
     }
 }
