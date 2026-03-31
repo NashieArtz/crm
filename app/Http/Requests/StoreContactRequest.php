@@ -22,15 +22,20 @@ class StoreContactRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'first_name' => ['required', 'string', 'max:100'],
-            'last_name'  => ['required', 'string', 'max:100'],
-            'email'      => ['nullable', 'email', 'max:150'],
-            'phone'      => ['nullable', 'string', 'max:50'],
-            'job_title'  => ['nullable', 'string', 'max:100'],
+        $contactId = $this->route('contact') ? $this->route('contact')->id_contact : null;
 
-            // Vérifie l'ID client envoyé dans table clients
-            'client_id'  => ['required', 'exists:clients,id_client'],
+        return [
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'unique:contacts,email,' . $contactId . ',id_contact'
+            ],
+            'phone' => ['nullable', 'string', 'max:255'],
+            'type' => ['nullable', 'in:lead,prospect,customer,partner'],
+            'description' => ['nullable', 'string'],
+            'client_id' => ['required', 'exists:clients,id_client'],
         ];
     }
 }

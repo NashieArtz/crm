@@ -14,7 +14,7 @@ class ActivityController extends Controller
 {
     public function index(): Response
     {
-        $activities = Activity::with('client:id_client,company_name')->latest('activity_date')->get();
+        $activities = Activity::with('client:id_client,company_name')->latest('date_activity')->get();
 
         return Inertia::render('Activities/Index', [
             'activities' => $activities,
@@ -23,7 +23,12 @@ class ActivityController extends Controller
 
     public function store(StoreActivityRequest $request): RedirectResponse
     {
-        Activity::create($request->validated());
+        $activity = Activity::create($request->validated());
+
+        // Liaison clients envoyés dans tableau client_ids
+        if ($request->has('client_ids')) {
+            $activity->clients()->attach($request->client_ids);
+        }
 
         return redirect()->back()->with('success', 'Activity created successfully.');
     }
@@ -31,6 +36,11 @@ class ActivityController extends Controller
     public function update(UpdateActivityRequest $request, Activity $activity): RedirectResponse
     {
         $activity->update($request->validated());
+
+        // Suppresion anciens, ajout nouveaux clients
+        if ($request->has('client_ids')) {
+            $activity->clients()->sync($request->client_ids);
+        }
 
         return redirect()->back()->with('success', 'Activity updated successfully.');
     }
