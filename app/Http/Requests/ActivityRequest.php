@@ -15,12 +15,12 @@ class ActivityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:150'],
+            'type' => ['nullable', 'in:call,email,meeting,task,note'],
             'description' => ['nullable', 'string'],
-            'type' => ['required', Rule::in(['call', 'email', 'meeting', 'task'])],
-            'status' => ['required', Rule::in(['pending', 'completed', 'cancelled'])],
-            'activity_date' => ['required', 'date'],
-            'client_id' => ['required', 'exists:clients,id_client'],
+            'date_activity' => ['required', 'date'],
+            // table pivot
+            'client_ids' => ['required', 'array'],
+            'client_ids.*' => ['exists:clients,id_client'],
         ];
     }
 }

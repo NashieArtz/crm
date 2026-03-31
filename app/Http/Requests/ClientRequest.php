@@ -26,13 +26,15 @@ class ClientRequest extends FormRequest
         // Get id client si on est sur la route pour update
         $clientId = $this->route('client') ? $this->route('client')->id_client : null;
         return [
-            'company_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('clients', 'email')->ignore($clientId, 'id_client')],
-            'phone' => ['nullable', 'string', 'max:255'],
-            'website' => ['nullable', 'string', 'max:500'],
-            'address' => ['nullable', 'string', 'max:500'],
-            'website' => ['nullable', 'string', 'max:500'],
-            'website' => ['nullable', 'string', 'max:500'],
+            'company_name' => ['required', 'string', 'max:100'],
+            'email' => [
+                'required',
+                'email',
+                'max:100',
+                Rule::unique('clients', 'email')->ignore($clientId, 'id_client')
+            ],
+            'phone' => ['nullable', 'string', 'max:30'],
+            'website' => ['nullable', 'string', 'max:100'],
             'income' => ['nullable', 'integer', 'min:0'],
         ];
     }
