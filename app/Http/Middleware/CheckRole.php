@@ -14,6 +14,7 @@ class CheckRole
             abort(403, 'Unauthorized action.');
         }
 
+        // Permet de passer à la prochaine requête
         return $next($request);
     }
 }
