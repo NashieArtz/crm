@@ -30,6 +30,7 @@ class UpdateContactRequest extends FormRequest
             'email' => [
                 'required',
                 'email',
+                // Éviter le "email existe déjà"
                 'unique:contacts,email,' . $contactId . ',id_contact'
             ],
             'phone' => ['nullable', 'string', 'max:255'],
