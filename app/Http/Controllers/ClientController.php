@@ -16,7 +16,7 @@ class ClientController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // L'user connecté
         $user = auth()->user();
@@ -26,9 +26,11 @@ class ClientController extends Controller
             ->when(!$user->isAdmin(), function ($query) use ($user) {
                 // Si pas admin, on ne voit que les clients où on est présent si on est dans table pivot
                 $query->whereHas('users', function ($q) use ($user) {
-                    $q->where('user_id', $user->id_user);
+                    $q->where('client_user.user_id', $user->id_user);
                 });
             })
+            // éviter requêtes N+1 pour la vue
+            ->with(['contacts', 'opportunities'])
             ->latest()
             ->get();
 
@@ -57,7 +59,7 @@ class ClientController extends Controller
      */
     public function show(Client $client): Response
     {
-        $client->load(['contacts', 'opportunities',
+        $client->load(['contacts', 'opportunities', 'users',
             'activities' => function ($query) {
                 $query->latest('date_activity');
             },
@@ -73,6 +75,9 @@ class ClientController extends Controller
      */
     public function update(ClientRequest $request, Client $client): RedirectResponse
     {
+        // Vérifier la policy avant d'update
+        Gate::authorize('update', $client);
+
         $client->update($request->validated());
 
         return redirect()->route('clients.index')->with('success', 'Client updated successfully.');
