@@ -44,6 +44,18 @@ class DashboardController extends Controller
         $monthlyIncome = [];
         $totalIncome = 0;
 
+        // Génération des 12 mois en array
+        for ($i = 11; $i >= 0; $i--) {
+            $monthDate = now()->subMonths($i);
+            $monthLabel = $monthDate->format('M Y');
+
+            $monthlyIncome[$monthLabel] = [
+                'month' => $monthLabel,
+                'amount' => 0,
+                'total' => 0,
+            ];
+        }
+
         // Requête
         $incomeDataMonth = Opportunity::where('status', 'closed_won')
             ->where('updated_at', '>=', now()->subYear())
@@ -53,29 +65,32 @@ class DashboardController extends Controller
         // Boucle sur chaque opportunités
         foreach ($incomeDataMonth as $month) {
             $monthFormat = $month->updated_at->format('M Y');
-
-            // If month !exists in array, initialize
-            if (! isset($monthlyIncome[$monthFormat])) {
-                $monthlyIncome[$monthFormat] = [
-                    'month' => $monthFormat,
-                    'amount' => 0,
-                    'total' => 0,
-                ];
+            if (isset($monthlyIncome[$monthFormat])) {
+                // Montant du mois en cours
+                $monthlyIncome[$monthFormat]['amount'] += (float) $month->amount;
             }
-
-            // Montant du mois en cours
-            $monthlyIncome[$monthFormat]['amount'] += (float) $month->amount;
-
         }
         // Cumulation du montant
-        foreach ($monthlyIncome as $data) {
+        // Pointeur directe vers la mémoire
+        foreach ($monthlyIncome as &$data) {
             $totalIncome += $data['amount'];
-            $data['total'] += $totalIncome;
+            $data['total'] = $totalIncome;
         }
+        unset($data);
         // </editor-fold>
 
         // <editor-fold desc="INCOME PER WEEK OVER 6 MONTHS">
         $weeklyIncome = [];
+
+        // Génération des semaines
+        for ($i = 25; $i >= 0; $i--) {
+            $weekDate = now()->subWeeks($i);
+            $weekNum = $weekDate->format('W');
+            $weeklyIncome[$weekNum] = [
+                'label' => $weekNum,
+                'income' => 0,
+            ];
+        }
 
         $incomeDataWeek = Opportunity::where('status', 'closed_won')
             ->where('updated_at', '>=', now()->subMonths(6))
@@ -83,15 +98,18 @@ class DashboardController extends Controller
 
         foreach ($incomeDataWeek as $data) {
             $weekFormat = $data->updated_at->format('W');
+<<<<<<< HEAD
+            if (isset($weeklyIncome[$weekFormat])) {
+                $weeklyIncome[$weekFormat]['income'] += (float) $data->amount;
+=======
 
             if (! isset($weeklyIncome[$weekFormat])) {
                 $weeklyIncome[$weekFormat] = [
                     'label' => $weekFormat,
                     'income' => 0,
                 ];
+>>>>>>> 477c19892b6baedfaec56ff45237143b238777da
             }
-
-            $weeklyIncome[$weekFormat]['income'] += (float) $data->amount;
         }
         // </editor-fold>
 

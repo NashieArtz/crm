@@ -40,7 +40,11 @@ class ClientController extends Controller
      */
     public function show(Client $client): Response
     {
-        $client->load(['contacts', 'opportunities', 'activities']);
+        $client->load(['contacts', 'opportunities',
+            'activities' => function ($query) {
+                $query->latest('date_activity');
+            },
+        ]);
 
         return Inertia::render('Client/Show', [
             'client' => $client,
