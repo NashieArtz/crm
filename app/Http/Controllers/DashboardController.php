@@ -84,8 +84,8 @@ class DashboardController extends Controller
         foreach ($incomeDataWeek as $data) {
             $weekFormat = $data->updated_at->format('W');
 
-            if (! isset($weeklyReport[$weekFormat])) {
-                $weeklyReport[$weekFormat] = [
+            if (! isset($weeklyIncome[$weekFormat])) {
+                $weeklyIncome[$weekFormat] = [
                     'label' => $weekFormat,
                     'income' => 0,
                 ];
@@ -131,7 +131,10 @@ class DashboardController extends Controller
         // </editor-fold>
 
         // Dernières opportunités
-        $latestOpportunities = Opportunity::with('orders')->latest()->limit(10)->get();
+        $latestOpportunities = Opportunity::with('client:id_client,company_name')
+            ->latest()
+            ->limit(10)
+            ->get();
 
         // Dernières opportunités en dépend de status et/ou type
         $latestOpportunitiesByOption = Opportunity::query()
@@ -150,9 +153,10 @@ class DashboardController extends Controller
                     $query->whereIn('type', $types);
                 }
             })
-            ->with(['orders' => function ($query) {
-                $query->latest();
-            }])->latest()->limit(10)->get();
+            ->with('client:id_client,company_name')
+            ->latest()
+            ->limit(10)
+            ->get();
 
         // Dernières activités
         $latestActivities = Activity::latest()->limit(10)->get();
@@ -169,6 +173,9 @@ class DashboardController extends Controller
                 'monthlyIncome' => array_values($monthlyIncome),
                 'weeklyIncome' => array_values($weeklyIncome),
             ],
+
+            // 1 to 12 - jan to dec, boucle
+            //
 
             'opportunityPotentialIncome' => $opportunityPotentialIncome,
             'opportunityTotalIncome' => $opportunityTotalIncome,
