@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\OpportunityController;
@@ -20,6 +21,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('clients', ClientController::class)->except(['create', 'edit']);
     Route::resource('opportunities', OpportunityController::class)->except(['create', 'edit', 'show']);
     Route::resource('activities', ActivityController::class)->except(['create', 'edit', 'show']);
+    Route::resource('contacts', ContactController::class)->except(['create', 'edit', 'show']);
 });
 
 //

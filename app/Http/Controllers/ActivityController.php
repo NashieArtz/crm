@@ -25,20 +25,20 @@ class ActivityController extends Controller
     {
         Activity::create($request->validated());
 
-        return redirect()->back()->with('success', 'Activité créée.');
+        return redirect()->back()->with('success', 'Activity created successfully.');
     }
 
     public function update(UpdateActivityRequest $request, Activity $activity): RedirectResponse
     {
         $activity->update($request->validated());
 
-        return redirect()->back()->with('success', 'Activité mise à jour.');
+        return redirect()->back()->with('success', 'Activity updated successfully.');
     }
 
     public function destroy(Activity $activity): RedirectResponse
     {
         $activity->delete();
 
-        return redirect()->back()->with('success', 'Activité supprimée.');
+        return redirect()->back()->with('success', 'Activity deleted successfully.');
     }
 }
