@@ -43,8 +43,6 @@ class ClientRequest extends FormRequest
         return [
             'company_name.required' => 'The name field is required.',
             'name.required' => 'The name field is required.',
-            'company_name.required' => 'The name field is required.',
-            'company_name.required' => 'The name field is required.',
             'email.required' => 'The email field is required.',
         ];
     }
