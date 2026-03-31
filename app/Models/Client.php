@@ -58,6 +58,8 @@ class Client extends Model
     // Many to Many
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'client_user', 'client_id', 'user_id');
+        return $this->belongsToMany(User::class, 'client_user', 'client_id', 'user_id')
+            ->withPivot('is_primary')
+            ->withTimestamps();
     }
 }

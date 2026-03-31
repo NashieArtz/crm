@@ -58,12 +58,24 @@ class User extends Authenticatable
 
     public function role(): BelongsTo
     {
-        return $this->belongsTo(Role::class, 'role_id', 'id_role');
+        return $this->belongsTo(Role::class);
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->role && $this->role->name === $role;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
     }
 
     // Many to Many
     public function clients(): BelongsToMany
     {
-        return $this->belongsToMany(Client::class, 'client_user', 'user_id', 'client_id');
+        return $this->belongsToMany(Client::class, 'client_user', 'user_id', 'client_id')
+            ->withPivot('is_primary')
+            ->withTimestamps();
     }
 }

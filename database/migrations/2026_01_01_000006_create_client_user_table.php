@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('id_client_user');
             $table->foreignId('user_id')->constrained('users', 'id_user')->cascadeOnDelete();
             $table->foreignId('client_id')->constrained('clients', 'id_client')->cascadeOnDelete();
+            $table->boolean('is_primary')->default(true);
             $table->timestamps();
         });
     }

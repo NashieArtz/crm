@@ -26,6 +26,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('addresses', AddressController::class)->except(['create', 'edit', 'show']);
 });
 
-//
+// Role Management
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/settings', [AdminController::class, 'index'])->name('admin.settings');
+});
 
 require __DIR__.'/settings.php';
