@@ -71,6 +71,14 @@ class ClientController extends Controller
     }
 
     /**
+<<<<<<< HEAD
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id) {}
+
+    /**
+=======
+>>>>>>> cc887e61f740d417c581e075a25a3e10074639b7
      * Update the specified resource in storage.
      */
     public function update(ClientRequest $request, Client $client): RedirectResponse
