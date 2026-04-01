@@ -1,10 +1,9 @@
 import { Head } from '@inertiajs/react';
-import { ChartContainer } from '@/components/ui/chart';
+import { ChartDashboard } from '@/components/chart-dashboard';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
@@ -12,15 +11,23 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard({ incomeData }) {
+export default function Dashboard(data: any) {
+    console.log(data);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                     <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border"></div>
-                    <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    <div className="relative aspect-video overflow-visible rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
+                        <ChartDashboard
+                            title="Revenu total par mois"
+                            description="Évolution du revenu sur les 12 derniers mois"
+                            chartData={data.incomeData.monthlyIncome}
+                            xAxis="month"
+                            yAxis="total"
+                        />
                     </div>
                     <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />

@@ -14,7 +14,7 @@ class ActivityController extends Controller
 {
     public function index(): Response
     {
-        $activities = Activity::with('client:id_client,company_name')->latest('date_activity')->get();
+        $activities = Activity::with('client:id_client,company_name')->latest('activity_date')->get();
 
         return Inertia::render('Activities/Index', [
             'activities' => $activities,

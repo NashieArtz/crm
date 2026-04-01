@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-
 class DashboardController extends Controller
 {
     /**
@@ -59,7 +58,14 @@ class DashboardController extends Controller
 
         // Opportunities
         $totalOpportunities = Opportunity::count();
-        $opportunityPotentialIncome = Opportunity::whereIn('status', ['negotiation', 'proposal', 'qualification'])->sum('amount');
+        $opportunityPotentialIncome = Opportunity::whereIn(
+            'status',
+            [
+                'negotiation',
+                'proposal',
+                'qualification',
+            ]
+        )->sum('amount');
         $opportunityTotalIncome = Opportunity::whereIn('status', ['closed_won'])->sum('amount');
         $opportunityPotentialTotalIncome = $opportunityPotentialIncome + $opportunityTotalIncome;
 
@@ -203,12 +209,12 @@ class DashboardController extends Controller
             ->select([
                 'type',
                 DB::raw('COUNT(*) as count'),
-                DB::raw('SUM(amount) as total_amount')
+                DB::raw('SUM(amount) as total_amount'),
             ])
             ->groupBy('type')
             ->get()
             // boucle sur chaque item de get()
-            ->map(fn ($item) => [
+            ->map(fn($item) => [
                 // ucfirst() -> upper case first
                 'name' => ucfirst(str_replace('_', ' ', $item->type)),
                 'value' => (float) $item->total_amount,
@@ -219,14 +225,14 @@ class DashboardController extends Controller
         $topAccounts = (clone $baseWonQuery)
             ->select([
                 'client_id',
-                DB::raw('SUM(amount) as total_revenue')
+                DB::raw('SUM(amount) as total_revenue'),
             ])
             ->with('client:id_client,company_name')
             ->groupBy('client_id')
             ->orderByDesc('total_revenue')
             ->limit(5)
             ->get()
-            ->map(fn ($item) => [
+            ->map(fn($item) => [
                 'company' => $item->client->company_name ?? 'Deleted client',
                 'revenue' => (float) $item->total_revenue,
             ]);
@@ -245,7 +251,6 @@ class DashboardController extends Controller
                 'monthlyIncome' => array_values($monthlyIncome),
                 'weeklyIncome' => array_values($weeklyIncome),
             ],
-
             'opportunityPotentialIncome' => $opportunityPotentialIncome,
             'opportunityTotalIncome' => $opportunityTotalIncome,
             'opportunityPotentialTotalIncome' => $opportunityPotentialTotalIncome,
