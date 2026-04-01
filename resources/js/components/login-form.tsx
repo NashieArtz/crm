@@ -60,7 +60,7 @@ export function LoginForm({
                                         name="email"
                                         autoFocus
                                         tabIndex={1}
-                                        placeholder="enail@example.com"
+                                        placeholder="email@example.com"
                                         autoComplete="email"
                                         required
                                     />

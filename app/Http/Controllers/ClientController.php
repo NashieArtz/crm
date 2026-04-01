@@ -34,6 +34,8 @@ class ClientController extends Controller
             ->latest()
             ->get();
 
+        //dd($clients->toArray());
+
         return Inertia::render('Client/Index', [
             'clients' => $clients,
         ]);
