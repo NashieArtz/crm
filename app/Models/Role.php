@@ -11,7 +11,7 @@ class Role extends Model
     protected $primaryKey = 'id_role';
 
     protected $fillable = [
-        'name',
+        'rolename',
     ];
 
     public function users(): HasMany
