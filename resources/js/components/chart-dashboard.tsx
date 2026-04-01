@@ -1,6 +1,5 @@
 'use client';
 
-import DashboardController from '@/actions/App/Http/Controllers/DashBoardController';
 import { TrendingUp } from 'lucide-react';
 import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
 
@@ -20,17 +19,6 @@ import {
 import type { ChartConfig } from '@/components/ui/chart';
 export const description = 'A line chart';
 
-const chartData = [
-    { month: 'January', desktop: 186 },
-    { month: 'February', desktop: 305 },
-    { month: 'March', desktop: 237 },
-    { month: 'April', desktop: 73 },
-    { month: 'May', desktop: 209 },
-    { month: 'June', desktop: 214 },
-];
-
-DashboardController();
-
 const chartConfig = {
     desktop: {
         label: 'Desktop',
@@ -38,12 +26,24 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function ChartLineDefault() {
+export function ChartDashboard({
+    title,
+    description,
+    chartData,
+    xAxis,
+    yAxis,
+}: {
+    title: string;
+    description: string;
+    chartData: any;
+    xAxis: string;
+    yAxis: string;
+}) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Line Chart</CardTitle>
-                <CardDescription>January - June 2024</CardDescription>
+                <CardTitle>{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>
@@ -57,7 +57,7 @@ export function ChartLineDefault() {
                     >
                         <CartesianGrid vertical={false} />
                         <XAxis
-                            dataKey="month"
+                            dataKey={xAxis}
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
@@ -68,7 +68,7 @@ export function ChartLineDefault() {
                             content={<ChartTooltipContent hideLabel />}
                         />
                         <Line
-                            dataKey="desktop"
+                            dataKey={yAxis}
                             type="natural"
                             stroke="var(--color-desktop)"
                             strokeWidth={2}
