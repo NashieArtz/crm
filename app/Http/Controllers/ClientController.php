@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ClientRequest;
 use App\Models\Client;
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,12 +21,23 @@ class ClientController extends Controller
         // L'user connecté
         $user = auth()->user();
 
+        // analyse requête HTTP, GET (?search=)
+        $search = $request->input('search');
+
         // Get les clients les plus récents
         $clients = Client::query()
-            ->when(!$user->isAdmin(), function ($query) use ($user) {
+            ->when(! $user->isAdmin(), function ($query) use ($user) {
                 // Si pas admin, on ne voit que les clients où on est présent si on est dans table pivot
                 $query->whereHas('users', function ($q) use ($user) {
                     $q->where('client_user.user_id', $user->id_user);
+                });
+            })
+            // Recherche sécurisé
+            ->when($search, function ($query, $search) {
+                // $q add parenthèses invisibles en SQL
+                $query->where(function ($q) use ($search) {
+                    $q->where('company_name', 'like', "%{$search}%")
+                        ->orWhere('website', 'like', "%{$search}%");
                 });
             })
             // éviter requêtes N+1 pour la vue
@@ -34,10 +45,12 @@ class ClientController extends Controller
             ->latest()
             ->get();
 
-        //dd($clients->toArray());
+        // dd($clients->toArray());
 
         return Inertia::render('Client/Index', [
             'clients' => $clients,
+            // Extrait only les données de (?search=)
+            'filters' => $request->only(['search']),
         ]);
     }
 
@@ -123,6 +136,7 @@ class ClientController extends Controller
         // Seul le titulaire peut virer son backup
         Gate::authorize('update', $client);
         $client->users()->detach($user->id_user);
+
         return redirect()->back()->with('success', 'Backup removed.');
     }
 }
