@@ -2,33 +2,43 @@ import { useForm } from '@inertiajs/react';
 import React from 'react';
 interface ContactFormProps {
     clientId: number;
+    contact?: any;
     onSuccess?: () => void;
 }
 
-export function ContactForm({ clientId, onSuccess }: ContactFormProps) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+export function ContactForm({
+    clientId,
+    contact,
+    onSuccess,
+}: ContactFormProps) {
+    const { data, setData, post, put, processing, errors, reset } = useForm({
         client_id: clientId,
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: '',
-        type: '',
-        description: '',
+        first_name: contact?.first_name || '',
+        last_name: contact?.last_name || '',
+        email: contact?.email || '',
+        phone: contact?.phone || '',
+        description: contact?.description || '',
+        type: contact?.type || 'prospect',
     });
 
     const submitContact = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/contacts', {
+        const options = {
             preserveScroll: true,
             onSuccess: () => {
-                // Vider le formulaire
                 reset();
 
                 if (onSuccess) {
                     onSuccess();
                 }
             },
-        });
+        };
+
+        if (contact) {
+            put(`/contacts/${contact.id_contact}`, options);
+        } else {
+            post('/contacts', options);
+        }
     };
 
     return (
@@ -36,6 +46,20 @@ export function ContactForm({ clientId, onSuccess }: ContactFormProps) {
             onSubmit={submitContact}
             className="mb-6 grid grid-cols-1 gap-4 rounded-lg bg-muted/30 p-4 md:grid-cols-5"
         >
+            <div className="col-span-full mb-2 flex items-center justify-between">
+                <h3 className="text-sm font-bold">
+                    {contact ? 'Modifier le contact' : 'Ajouter un contact'}
+                </h3>
+                {contact && (
+                    <button
+                        type="button"
+                        onClick={onSuccess}
+                        className="text-xs text-muted-foreground hover:text-foreground"
+                    >
+                        Annuler
+                    </button>
+                )}
+            </div>
             <div className="col-span-1 flex gap-4 md:col-span-2">
                 <input
                     type="text"
@@ -96,7 +120,7 @@ export function ContactForm({ clientId, onSuccess }: ContactFormProps) {
                     disabled={processing}
                     className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                 >
-                    Enregistrer
+                    {contact ? 'Mettre à jour' : 'Enregistrer'}
                 </button>
             </div>
 
