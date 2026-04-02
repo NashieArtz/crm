@@ -14,7 +14,9 @@ class ActivityController extends Controller
 {
     public function index(): Response
     {
-        $activities = Activity::with('client:id_client,company_name')->latest('activity_date')->get();
+        $activities = Activity::with('clients:id_client,company_name')
+            ->latest('date_activity')
+            ->get();
 
         return Inertia::render('Activities/Index', [
             'activities' => $activities,
@@ -23,11 +25,14 @@ class ActivityController extends Controller
 
     public function store(StoreActivityRequest $request): RedirectResponse
     {
-        $activity = Activity::create($request->validated());
+        // Extraire données
+        $activityData = $request->safe()->except(['client_id']);
+
+        $activity = Activity::create($activityData);
 
         // Liaison clients envoyés dans tableau client_ids
-        if ($request->has('client_ids')) {
-            $activity->clients()->attach($request->client_ids);
+        if ($request->has('client_id')) {
+            $activity->clients()->attach($request->client_id);
         }
 
         return redirect()->back()->with('success', 'Activity created successfully.');
@@ -35,10 +40,14 @@ class ActivityController extends Controller
 
     public function update(UpdateActivityRequest $request, Activity $activity): RedirectResponse
     {
-        $activity->update($request->validated());
+        $activityData = $request->safe()->except(['client_id', 'client_ids']);
+
+        $activity->update($activityData);
 
         // Suppresion anciens, ajout nouveaux clients
         if ($request->has('client_ids')) {
+            $activity->clients()->sync([$request->client_id]);
+        } elseif ($request->has('client_ids')) {
             $activity->clients()->sync($request->client_ids);
         }
 

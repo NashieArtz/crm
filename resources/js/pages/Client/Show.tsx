@@ -11,6 +11,7 @@ import {
 import { useState } from 'react';
 import { ContactForm } from '@/components/contact-form';
 import { OpportunityForm } from '@/components/opportunity-form';
+import { ActivityForm } from '@/components/activity-form';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -22,6 +23,7 @@ export default function Show({ client }: { client: any }) {
 
     const [showContactForm, setShowContactForm] = useState(false);
     const [showOpportunityForm, setShowOpportunityForm] = useState(false);
+    const [showActivityForm, setShowActivityForm] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -231,10 +233,30 @@ export default function Show({ client }: { client: any }) {
                     </div>
 
                     {/* Historique des Activités */}
+                    {/* Historique des Activités */}
                     <div className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm">
-                        <h2 className="mb-4 border-b pb-2 text-lg font-bold">
-                            Historique (Activités)
-                        </h2>
+                        <div className="mb-4 flex items-center justify-between border-b pb-4">
+                            <h2 className="text-lg font-bold">
+                                Historique (Activités)
+                            </h2>
+                            <button
+                                onClick={() =>
+                                    setShowActivityForm(!showActivityForm)
+                                }
+                                className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                            >
+                                <Plus size={16} /> Nouvelle activité
+                            </button>
+                        </div>
+
+                        {/* Appel du formulaire */}
+                        {showActivityForm && (
+                            <ActivityForm
+                                clientId={client.id_client}
+                                onSuccess={() => setShowActivityForm(false)}
+                            />
+                        )}
+
                         <ul className="relative space-y-4 before:absolute before:inset-0 before:ml-2 before:h-full before:w-0.5 before:-translate-x-px before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent md:before:mx-auto md:before:translate-x-0">
                             {client.activities?.length === 0 ? (
                                 <li className="pl-6 text-sm text-muted-foreground">
@@ -251,7 +273,7 @@ export default function Show({ client }: { client: any }) {
                                                 <span className="rounded-full border bg-background px-2 py-1 text-xs text-muted-foreground">
                                                     {new Date(
                                                         activity.date_activity,
-                                                    ).toLocaleDateString()}
+                                                    ).toLocaleString()}
                                                 </span>
                                             </div>
                                             <div className="ml-4 w-full rounded-lg border bg-muted/50 p-3 md:w-1/2">
