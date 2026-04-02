@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CRM Les Vieux Biscuits
 
 Application CRM full-stack developpee pour la gestion de portefeuille clients, le suivi des opportunites commerciales et l'administration d'equipe. Ce projet est base sur une architecture monolithique moderne.
@@ -109,3 +110,6 @@ Le fichier d'import SQL contient deja un compte administrateur preconfigure. Uti
 ## Acces User
 * Email : lucas@crm.fr
 * Mot de passe : lucas1234
+=======
+# crm
+>>>>>>> 9bdaedaabe2f5ff50e2c88e38e5abac0bbbe8501
