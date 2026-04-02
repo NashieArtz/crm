@@ -9,9 +9,10 @@ import {
     BriefcaseBusiness,
 } from 'lucide-react';
 import { useState } from 'react';
+import { ContactForm } from '@/components/contact-form';
+import { OpportunityForm } from '@/components/opportunity-form';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { ContactForm } from '@/components/contact-form';
 
 export default function Show({ client }: { client: any }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -20,6 +21,7 @@ export default function Show({ client }: { client: any }) {
     ];
 
     const [showContactForm, setShowContactForm] = useState(false);
+    const [showOpportunityForm, setShowOpportunityForm] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -150,9 +152,28 @@ export default function Show({ client }: { client: any }) {
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {/* Opportunités */}
                     <div className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm">
-                        <h2 className="mb-4 border-b pb-2 text-lg font-bold">
-                            Opportunités liées
-                        </h2>
+                        <div className="mb-4 flex items-center justify-between border-b pb-4">
+                            <h2 className="text-lg font-bold">
+                                Opportunités liées
+                            </h2>
+                            <button
+                                onClick={() =>
+                                    setShowOpportunityForm(!showOpportunityForm)
+                                }
+                                className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                            >
+                                <Plus size={16} /> Nouvelle opportunité
+                            </button>
+                        </div>
+
+                        {/* Appel du formulaire */}
+                        {showOpportunityForm && (
+                            <OpportunityForm
+                                clientId={client.id_client}
+                                onSuccess={() => setShowOpportunityForm(false)}
+                            />
+                        )}
+
                         <ul className="space-y-3">
                             {client.opportunities?.length === 0 ? (
                                 <li className="text-sm text-muted-foreground">
@@ -165,13 +186,11 @@ export default function Show({ client }: { client: any }) {
                                         className="flex items-start justify-between rounded-lg bg-muted/30 p-4"
                                     >
                                         <div className="flex flex-col gap-1">
-                                            {/* Remplacement du nom par la description comme élément principal */}
                                             <p className="mb-1 text-sm font-semibold text-foreground">
                                                 {opp.details ||
                                                     'Description non renseignée'}
                                             </p>
 
-                                            {/* Détails : Source, Type, Statut, Date */}
                                             <p className="text-xs text-muted-foreground">
                                                 <strong className="font-medium text-foreground/80">
                                                     Source :
@@ -202,7 +221,6 @@ export default function Show({ client }: { client: any }) {
                                             </p>
                                         </div>
 
-                                        {/* Montant aligné à droite */}
                                         <span className="mt-1 rounded-md bg-primary/10 px-2 py-1 text-sm font-bold whitespace-nowrap text-primary">
                                             {opp.amount} €
                                         </span>
