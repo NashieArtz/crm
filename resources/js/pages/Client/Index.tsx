@@ -1,15 +1,56 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import {
+    Building2,
+    Globe,
+    ArrowRight,
+    Briefcase,
+    Plus,
+    Search,
+} from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import AppLayout from '@/layouts/app-layout';
+import { ClientForm } from '@/components/client-form';
 import type { BreadcrumbItem } from '@/types';
-// Ajout de l'icône Plus
-import { Building2, Globe, ArrowRight, Briefcase, Plus } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/dashboard' },
     { title: 'Clients', href: '/clients' },
 ];
 
-export default function Index({ clients }: { clients: any[] }) {
+export default function Index({
+    clients,
+    filters,
+}: {
+    clients: any[];
+    filters: any;
+}) {
+    // Gérer ce qui est tapé dans la searchbar
+    const [searchTerm, setSearchTerm] = useState(filters?.search || '');
+    const [showClientForm, setShowClientForm] = useState(false);
+
+    // Exec func dès que searchTerm change
+    useEffect(() => {
+        // Anti-rebond, éviter 50 requêtes en 1 secondes
+        const delaySearch = setTimeout(() => {
+            // Requête silencieuse (AJAX)
+            router.get(
+                '/clients',
+                { search: searchTerm },
+                {
+                    // Garde les états
+                    preserveState: true,
+                    // Empêche la page de remonter tout en haut
+                    preserveScroll: true,
+                    // Remplace l'historique au lieu d'empiler, évite de devoir faire 10 fois retour sur la page
+                    replace: true,
+                },
+            );
+        }, 300);
+
+        // destroy timer
+        return () => clearTimeout(delaySearch);
+    }, [searchTerm]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Liste des Clients" />
@@ -29,11 +70,31 @@ export default function Index({ clients }: { clients: any[] }) {
                     {/* Bouton Nouveau Client */}
                     <button
                         type="button"
+                        onClick={() => setShowClientForm(!showClientForm)}
                         className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium whitespace-nowrap text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
                     >
                         <Plus size={16} />
                         Nouveau Client
                     </button>
+                </div>
+
+                {/* Affichage conditionnel du formulaire Client */}
+                {showClientForm && (
+                    <ClientForm onSuccess={() => setShowClientForm(false)} />
+                )}
+
+                {/* Barre de recherche */}
+                <div className="mb-6 flex items-center">
+                    <div className="relative w-full max-w-sm">
+                        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                        <input
+                            type="text"
+                            placeholder="Rechercher une entreprise ou un site web..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="flex h-10 w-full rounded-md border border-input bg-background py-2 pr-4 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                    </div>
                 </div>
 
                 {clients.length === 0 ? (

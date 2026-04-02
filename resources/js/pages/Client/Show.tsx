@@ -1,5 +1,17 @@
-import { Head, Link } from '@inertiajs/react';
-import { Building2, Mail, Phone, Globe } from 'lucide-react';
+import { Head, Link }    from '@inertiajs/react';
+import {
+    Building2,
+    Mail,
+    Phone,
+    Globe,
+    User as UserIcon,
+    Plus,
+    BriefcaseBusiness,
+} from 'lucide-react';
+import { useState } from 'react';
+import { ContactForm } from '@/components/contact-form';
+import { OpportunityForm } from '@/components/opportunity-form';
+import { ActivityForm } from '@/components/activity-form';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
@@ -8,6 +20,10 @@ export default function Show({ client }: { client: any }) {
         { title: 'Clients', href: '/clients' },
         { title: client.company_name, href: `/clients/${client.id_client}` },
     ];
+
+    const [showContactForm, setShowContactForm] = useState(false);
+    const [showOpportunityForm, setShowOpportunityForm] = useState(false);
+    const [showActivityForm, setShowActivityForm] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -59,12 +75,107 @@ export default function Show({ client }: { client: any }) {
                     </div>
                 </div>
 
+                {/* Contacts */}
+                <div className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm">
+                    <div className="mb-4 flex items-center justify-between border-b pb-4">
+                        <h2 className="text-lg font-bold">
+                            Contacts de l'entreprise
+                        </h2>
+                        <button
+                            onClick={() => setShowContactForm(!showContactForm)}
+                            className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                        >
+                            <Plus size={16} /> Ajouter un contact
+                        </button>
+                    </div>
+
+                    {/* Appel */}
+                    {showContactForm && (
+                        <ContactForm
+                            clientId={client.id_client}
+                            onSuccess={() => setShowContactForm(false)}
+                        />
+                    )}
+
+                    {/* Liste contacts */}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {!client.contacts || client.contacts.length === 0 ? (
+                            <p className="col-span-full text-sm text-muted-foreground">
+                                Aucun contact enregistré pour ce client.
+                            </p>
+                        ) : (
+                            client.contacts.map((contact: any) => (
+                                <div
+                                    key={contact.id_contact}
+                                    className="flex flex-col gap-2 rounded-lg border bg-background p-4 shadow-sm"
+                                >
+                                    <div className="flex items-center gap-3 border-b pb-2">
+                                        <div className="rounded-full bg-secondary p-2 text-secondary-foreground">
+                                            <UserIcon size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-foreground">
+                                                {contact.first_name}{' '}
+                                                {contact.last_name}
+                                            </p>
+                                            <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                <BriefcaseBusiness size={12} />{' '}
+                                                {contact.description ||
+                                                    'Poste non renseigné'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                                        {contact.email && (
+                                            <a
+                                                href={`mailto:${contact.email}`}
+                                                className="flex items-center gap-2 hover:text-blue-500"
+                                            >
+                                                <Mail size={14} />{' '}
+                                                {contact.email}
+                                            </a>
+                                        )}
+                                        {contact.phone && (
+                                            <a
+                                                href={`tel:${contact.phone}`}
+                                                className="flex items-center gap-2 hover:text-blue-500"
+                                            >
+                                                <Phone size={14} />{' '}
+                                                {contact.phone}
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {/* Opportunités */}
                     <div className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm">
-                        <h2 className="mb-4 border-b pb-2 text-lg font-bold">
-                            Opportunités liées
-                        </h2>
+                        <div className="mb-4 flex items-center justify-between border-b pb-4">
+                            <h2 className="text-lg font-bold">
+                                Opportunités liées
+                            </h2>
+                            <button
+                                onClick={() =>
+                                    setShowOpportunityForm(!showOpportunityForm)
+                                }
+                                className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                            >
+                                <Plus size={16} /> Nouvelle opportunité
+                            </button>
+                        </div>
+
+                        {/* Appel du formulaire */}
+                        {showOpportunityForm && (
+                            <OpportunityForm
+                                clientId={client.id_client}
+                                onSuccess={() => setShowOpportunityForm(false)}
+                            />
+                        )}
+
                         <ul className="space-y-3">
                             {client.opportunities?.length === 0 ? (
                                 <li className="text-sm text-muted-foreground">
@@ -77,13 +188,11 @@ export default function Show({ client }: { client: any }) {
                                         className="flex items-start justify-between rounded-lg bg-muted/30 p-4"
                                     >
                                         <div className="flex flex-col gap-1">
-                                            {/* Remplacement du nom par la description comme élément principal */}
                                             <p className="mb-1 text-sm font-semibold text-foreground">
-                                                {opp.details||
+                                                {opp.details ||
                                                     'Description non renseignée'}
                                             </p>
 
-                                            {/* Détails : Source, Type, Statut, Date */}
                                             <p className="text-xs text-muted-foreground">
                                                 <strong className="font-medium text-foreground/80">
                                                     Source :
@@ -114,7 +223,6 @@ export default function Show({ client }: { client: any }) {
                                             </p>
                                         </div>
 
-                                        {/* Montant aligné à droite */}
                                         <span className="mt-1 rounded-md bg-primary/10 px-2 py-1 text-sm font-bold whitespace-nowrap text-primary">
                                             {opp.amount} €
                                         </span>
@@ -125,10 +233,30 @@ export default function Show({ client }: { client: any }) {
                     </div>
 
                     {/* Historique des Activités */}
+                    {/* Historique des Activités */}
                     <div className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm">
-                        <h2 className="mb-4 border-b pb-2 text-lg font-bold">
-                            Historique (Activités)
-                        </h2>
+                        <div className="mb-4 flex items-center justify-between border-b pb-4">
+                            <h2 className="text-lg font-bold">
+                                Historique (Activités)
+                            </h2>
+                            <button
+                                onClick={() =>
+                                    setShowActivityForm(!showActivityForm)
+                                }
+                                className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                            >
+                                <Plus size={16} /> Nouvelle activité
+                            </button>
+                        </div>
+
+                        {/* Appel du formulaire */}
+                        {showActivityForm && (
+                            <ActivityForm
+                                clientId={client.id_client}
+                                onSuccess={() => setShowActivityForm(false)}
+                            />
+                        )}
+
                         <ul className="relative space-y-4 before:absolute before:inset-0 before:ml-2 before:h-full before:w-0.5 before:-translate-x-px before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent md:before:mx-auto md:before:translate-x-0">
                             {client.activities?.length === 0 ? (
                                 <li className="pl-6 text-sm text-muted-foreground">
@@ -145,7 +273,7 @@ export default function Show({ client }: { client: any }) {
                                                 <span className="rounded-full border bg-background px-2 py-1 text-xs text-muted-foreground">
                                                     {new Date(
                                                         activity.date_activity,
-                                                    ).toLocaleDateString()}
+                                                    ).toLocaleString()}
                                                 </span>
                                             </div>
                                             <div className="ml-4 w-full rounded-lg border bg-muted/50 p-3 md:w-1/2">

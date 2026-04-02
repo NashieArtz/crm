@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ClientRequest;
 use App\Models\Client;
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -21,23 +22,49 @@ class ClientController extends Controller
         // L'user connecté
         $user = auth()->user();
 
+        // analyse requête HTTP, GET (?search=)
+        $search = $request->input('search');
+        $status = $request->input('status');
+        $sort = $request->input('sort', 'desc');
+
         // Get les clients les plus récents
         $clients = Client::query()
-            ->when(!$user->isAdmin(), function ($query) use ($user) {
+            ->when(! $user->isAdmin(), function ($query) use ($user) {
                 // Si pas admin, on ne voit que les clients où on est présent si on est dans table pivot
                 $query->whereHas('users', function ($q) use ($user) {
                     $q->where('client_user.user_id', $user->id_user);
                 });
             })
+            // Recherche sécurisé
+            ->when($search, function ($query, $search) {
+                // $q add parenthèses invisibles en SQL
+                $query->where(function ($q) use ($search) {
+                    $q->where('company_name', 'ilike', "%{$search}%")
+                        ->orWhere('website', 'ilike', "%{$search}%");
+                });
+            })
+            // Filtre par status
+            ->when($status, function ($query, $status) {
+                $query->whereHas('opportunities', function ($q) use ($status) {
+                    $q->where('status', $status);
+                });
+            })
             // éviter requêtes N+1 pour la vue
             ->with(['contacts', 'opportunities'])
-            ->latest()
+            // Tri
+            ->when($sort === 'asc', function ($query) {
+                $query->orderBy('company_name', 'asc');
+            }, function ($query) {
+                $query->latest();
+            })
             ->get();
 
-        //dd($clients->toArray());
+        // dd($clients->toArray());
 
         return Inertia::render('Client/Index', [
             'clients' => $clients,
+            // Extrait only les données de (?search=)
+            'filters' => $request->only(['search', 'status', 'sort']),
         ]);
     }
 
@@ -46,10 +73,32 @@ class ClientController extends Controller
      */
     public function store(ClientRequest $request): RedirectResponse
     {
-        $client = Client::create($request->validated());
+        $validated = $request->validated();
 
-        // Lier l'utilisateur connecté comme sales_rep principal du client
-        $client->users()->attach(auth()->id(), ['is_primary' => true]);
+        // Transaction pour save client et contact
+        DB::transaction(function () use ($validated) {
+            // Extraction manuelle, éviter insérer tableau contacts
+            $client = Client::create([
+                'company_name' => $validated['company_name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'website' => $validated['website'] ?? null,
+                'income' => $validated['income'] ?? null,
+            ]);
+
+            // Lier l'utilisateur connecté comme sales_rep principal du client
+            $client->users()->attach(auth()->id(), ['is_primary' => true]);
+
+            // Créer contacts si y'a
+            if (!empty($validated['contacts'])) {
+                foreach ($validated['contacts'] as $contactData) {
+                    if (!empty($contactData['first_name']) && !empty($contactData['last_name'])) {
+                        // Utilise la relation HasMany
+                        $client->contacts()->create($contactData);
+                    }
+                }
+            }
+        });
 
         // Message flash
         // Check avec inertia flash
@@ -88,7 +137,8 @@ class ClientController extends Controller
         // Vérifier la policy avant d'update
         Gate::authorize('update', $client);
 
-        $client->update($request->validated());
+        $clientData = collect($request->validated())->except('contacts')->toArray();
+        $client->update($clientData);
 
         return redirect()->route('clients.index')->with('success', 'Client updated successfully.');
     }
@@ -123,6 +173,7 @@ class ClientController extends Controller
         // Seul le titulaire peut virer son backup
         Gate::authorize('update', $client);
         $client->users()->detach($user->id_user);
+
         return redirect()->back()->with('success', 'Backup removed.');
     }
 }

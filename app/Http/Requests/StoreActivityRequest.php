@@ -15,12 +15,10 @@ class StoreActivityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['nullable', 'in:call,email,meeting,task,note'],
-            'description' => ['nullable', 'string'],
+            'type' => ['required', 'string', 'in:call,email,meeting,task,note'],
+            'description' => ['required', 'string'],
             'date_activity' => ['required', 'date'],
-            // table pivot
-            'client_ids' => ['required', 'array'],
-            'client_ids.*' => ['exists:clients,id_client'],
+            'client_id' => ['required', 'exists:clients,id_client'],
         ];
     }
 }
