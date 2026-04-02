@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreContactRequest extends FormRequest
 {
@@ -30,7 +31,8 @@ class StoreContactRequest extends FormRequest
             'email' => [
                 'required',
                 'email',
-                'unique:contacts,email,' . $contactId . ',id_contact'
+                // Fix: Pas d'ignore d'ID
+                Rule::unique('contacts', 'email'),
             ],
             'phone' => ['nullable', 'string', 'max:255'],
             'type' => ['nullable', 'in:lead,prospect,customer,partner'],
