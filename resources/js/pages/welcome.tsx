@@ -18,7 +18,7 @@ export default function Welcome({
                     rel="stylesheet"
                 />
             </Head>
-            <div className="flex min-h-screen flex-col items-center bg-[#FDFDFC] p-6 text-[#1b1b18] lg:justify-center lg:p-8 dark:bg-[#000524]">
+            <div className="flex min-h-screen flex-col items-center bg-background p-6 text-foreground lg:justify-center lg:p-8">
                 <header className="mb-6 w-full max-w-[335px] text-sm not-has-[nav]:hidden lg:max-w-4xl">
                     <nav className="flex items-center justify-end gap-4">
                         {auth.user ? (
@@ -48,7 +48,7 @@ export default function Welcome({
                         )}
                     </nav>
                 </header>
-                <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:min-h-2/3 md:min-w-4/5 md:p-10 lg:min-w-200">
+                <div className="flex min-h-svh flex-col items-center bg-background justify-center p-6 md:min-h-2/3 md:min-w-4/5 md:p-10 lg:min-w-200">
                     <div className="w-full max-w-sm md:max-w-4xl">
                         <LoginForm />
                     </div>
