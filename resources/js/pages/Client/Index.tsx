@@ -63,6 +63,7 @@ export default function Index({
                         </p>
                     </div>
 
+                    {/* Bouton Nouveau Client */}
                     <button
                         type="button"
                         onClick={() => setShowClientForm(!showClientForm)}
@@ -102,12 +103,14 @@ export default function Index({
                         </p>
                     </div>
                 ) : (
+                    /* Grille */
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {clients.map((client) => (
                             <div
                                 key={client.id_client}
                                 className="group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:-translate-y-1 hover:shadow-md dark:hover:border-primary/50"
                             >
+                                {/* Carte client */}
                                 <div className="p-6">
                                     <div className="mb-4 flex items-center gap-3">
                                         <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -121,6 +124,7 @@ export default function Index({
                                         </h2>
                                     </div>
 
+                                    {/* Détails */}
                                     <div className="space-y-3 text-sm">
                                         {client.website ? (
                                             <a
@@ -198,6 +202,7 @@ export default function Index({
                                         )}
                                 </div>
 
+                                {/* Lien */}
                                 <div className="border-t bg-muted/20 p-4">
                                     <Link
                                         href={`/clients/${client.id_client}`}

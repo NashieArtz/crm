@@ -344,6 +344,7 @@ export default function Show({
                                                 </div>
                                             </div>
 
+                                            {/* Détails : Source, Type, Statut, Date */}
                                             <p className="text-xs text-muted-foreground">
                                                 <strong className="font-medium text-foreground/80">
                                                     Source :
