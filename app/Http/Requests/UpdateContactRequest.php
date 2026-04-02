@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateContactRequest extends FormRequest
 {
@@ -31,7 +32,7 @@ class UpdateContactRequest extends FormRequest
                 'required',
                 'email',
                 // Éviter le "email existe déjà"
-                'unique:contacts,email,' . $contactId . ',id_contact'
+                Rule::unique('contacts', 'email')->ignore($contactId, 'id_contact')
             ],
             'phone' => ['nullable', 'string', 'max:255'],
             'type' => ['nullable', 'in:lead,prospect,customer,partner'],

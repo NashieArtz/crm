@@ -1,13 +1,25 @@
-import { Head, Link } from '@inertiajs/react';
-import { Building2, Mail, Phone, Globe } from 'lucide-react';
+import { Head, Link }    from '@inertiajs/react';
+import {
+    Building2,
+    Mail,
+    Phone,
+    Globe,
+    User as UserIcon,
+    Plus,
+    BriefcaseBusiness,
+} from 'lucide-react';
+import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import { ContactForm } from '@/components/contact-form';
 
 export default function Show({ client }: { client: any }) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Clients', href: '/clients' },
         { title: client.company_name, href: `/clients/${client.id_client}` },
     ];
+
+    const [showContactForm, setShowContactForm] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -59,6 +71,82 @@ export default function Show({ client }: { client: any }) {
                     </div>
                 </div>
 
+                {/* Contacts */}
+                <div className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm">
+                    <div className="mb-4 flex items-center justify-between border-b pb-4">
+                        <h2 className="text-lg font-bold">
+                            Contacts de l'entreprise
+                        </h2>
+                        <button
+                            onClick={() => setShowContactForm(!showContactForm)}
+                            className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                        >
+                            <Plus size={16} /> Ajouter un contact
+                        </button>
+                    </div>
+
+                    {/* Appel */}
+                    {showContactForm && (
+                        <ContactForm
+                            clientId={client.id_client}
+                            onSuccess={() => setShowContactForm(false)}
+                        />
+                    )}
+
+                    {/* Liste contacts */}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {!client.contacts || client.contacts.length === 0 ? (
+                            <p className="col-span-full text-sm text-muted-foreground">
+                                Aucun contact enregistré pour ce client.
+                            </p>
+                        ) : (
+                            client.contacts.map((contact: any) => (
+                                <div
+                                    key={contact.id_contact}
+                                    className="flex flex-col gap-2 rounded-lg border bg-background p-4 shadow-sm"
+                                >
+                                    <div className="flex items-center gap-3 border-b pb-2">
+                                        <div className="rounded-full bg-secondary p-2 text-secondary-foreground">
+                                            <UserIcon size={20} />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-foreground">
+                                                {contact.first_name}{' '}
+                                                {contact.last_name}
+                                            </p>
+                                            <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                <BriefcaseBusiness size={12} />{' '}
+                                                {contact.description ||
+                                                    'Poste non renseigné'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                                        {contact.email && (
+                                            <a
+                                                href={`mailto:${contact.email}`}
+                                                className="flex items-center gap-2 hover:text-blue-500"
+                                            >
+                                                <Mail size={14} />{' '}
+                                                {contact.email}
+                                            </a>
+                                        )}
+                                        {contact.phone && (
+                                            <a
+                                                href={`tel:${contact.phone}`}
+                                                className="flex items-center gap-2 hover:text-blue-500"
+                                            >
+                                                <Phone size={14} />{' '}
+                                                {contact.phone}
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {/* Opportunités */}
                     <div className="rounded-xl border bg-card p-6 text-card-foreground shadow-sm">
@@ -79,7 +167,7 @@ export default function Show({ client }: { client: any }) {
                                         <div className="flex flex-col gap-1">
                                             {/* Remplacement du nom par la description comme élément principal */}
                                             <p className="mb-1 text-sm font-semibold text-foreground">
-                                                {opp.details||
+                                                {opp.details ||
                                                     'Description non renseignée'}
                                             </p>
 
