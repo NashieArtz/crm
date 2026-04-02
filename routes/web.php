@@ -41,6 +41,6 @@ Route::middleware(['auth', IsAdmin::class])->group(function () {
     // Paramètres
     Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
     Route::post('/admin/settings', [SettingController::class, 'store'])->name('admin.settings.store');
-
-    require __DIR__.'/settings.php';
 });
+
+require __DIR__.'/settings.php';
