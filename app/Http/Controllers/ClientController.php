@@ -29,7 +29,7 @@ class ClientController extends Controller
 
         // Get les clients les plus récents
         $clients = Client::query()
-            ->when(! $user->isAdmin(), function ($query) use ($user) {
+            ->when(!$user->isAdmin(), function ($query) use ($user) {
                 // Si pas admin, on ne voit que les clients où on est présent si on est dans table pivot
                 $query->whereHas('users', function ($q) use ($user) {
                     $q->where('client_user.user_id', $user->id_user);
@@ -50,7 +50,7 @@ class ClientController extends Controller
                 });
             })
             // éviter requêtes N+1 pour la vue
-            ->with(['contacts', 'opportunities'])
+            ->with(['contacts', 'opportunities', 'users'])
             // Tri
             ->when($sort === 'asc', function ($query) {
                 $query->orderBy('company_name', 'asc');
@@ -118,18 +118,11 @@ class ClientController extends Controller
 
         return Inertia::render('Client/Show', [
             'client' => $client,
+            'allUsers' => User::select('id_user', 'name', 'email')->get(),
         ]);
     }
 
-    /**
-<<<<<<< HEAD
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id) {}
-
-    /**
-=======
->>>>>>> cc887e61f740d417c581e075a25a3e10074639b7
+    /*
      * Update the specified resource in storage.
      */
     public function update(ClientRequest $request, Client $client): RedirectResponse
@@ -165,7 +158,7 @@ class ClientController extends Controller
         // On attache le remplaçant avec is_primary à false
         $client->users()->attach($request->user_id, ['is_primary' => false]);
 
-        return redirect()->back()->with('success', 'Backup user assigned successfully.');
+        return redirect()->back()->with('success', 'Commercial ajouté en backup.');
     }
 
     public function removeBackup(Request $request, Client $client, User $user): RedirectResponse
@@ -174,6 +167,6 @@ class ClientController extends Controller
         Gate::authorize('update', $client);
         $client->users()->detach($user->id_user);
 
-        return redirect()->back()->with('success', 'Backup removed.');
+        return redirect()->back()->with('success', 'Commercial retiré du dossier.');
     }
 }

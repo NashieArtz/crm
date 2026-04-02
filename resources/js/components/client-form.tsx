@@ -3,26 +3,18 @@ import { Plus, Trash2 } from 'lucide-react';
 import React from 'react';
 
 interface ClientFormProps {
+    client?: any;
     onSuccess?: () => void;
 }
 
-export function ClientForm({ onSuccess }: ClientFormProps) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        company_name: '',
-        email: '',
-        phone: '',
-        website: '',
-        income: '',
-        contacts: [
-            {
-                first_name: '',
-                last_name: '',
-                email: '',
-                phone: '',
-                type: 'prospect',
-                description: '',
-            },
-        ],
+export function ClientForm({ client, onSuccess }: ClientFormProps) {
+    const { data, setData, post, put, processing, errors, reset } = useForm({
+        company_name: client?.company_name || '',
+        email: client?.email || '',
+        phone: client?.phone || '',
+        website: client?.website || '',
+        income: client?.income || '',
+        contacts: [],
     });
 
     const addContact = () => {
@@ -58,7 +50,8 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
 
     const submitClient = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/clients', {
+
+        const options = {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
@@ -67,7 +60,13 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
                     onSuccess();
                 }
             },
-        });
+        };
+
+        if (client) {
+            put(`/clients/${client.id_client}`, options);
+        } else {
+            post('/clients', options);
+        }
     };
 
     return (
@@ -181,7 +180,7 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
                             className="relative grid grid-cols-1 gap-4 rounded-lg bg-muted/30 p-4 md:grid-cols-5"
                         >
                             {/* Suppression contact */}
-                            {data.contacts.length > 1 && (
+                            {data.contacts.length > 0 && (
                                 <button
                                     type="button"
                                     onClick={() => removeContact(index)}
@@ -305,7 +304,7 @@ export function ClientForm({ onSuccess }: ClientFormProps) {
                     disabled={processing}
                     className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                 >
-                    Créer le dossier complet
+                    {client ? 'Mettre à jour' : 'Créer le dossier complet'}
                 </button>
             </div>
         </form>

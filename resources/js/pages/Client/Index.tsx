@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     Building2,
     Globe,
@@ -6,10 +6,11 @@ import {
     Briefcase,
     Plus,
     Search,
+    Users,
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
-import AppLayout from '@/layouts/app-layout';
 import { ClientForm } from '@/components/client-form';
+import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -24,30 +25,25 @@ export default function Index({
     clients: any[];
     filters: any;
 }) {
-    // Gérer ce qui est tapé dans la searchbar
+    const { auth } = usePage<any>().props;
+    const isAdmin = auth.user?.is_admin || false;
+
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [showClientForm, setShowClientForm] = useState(false);
 
-    // Exec func dès que searchTerm change
     useEffect(() => {
-        // Anti-rebond, éviter 50 requêtes en 1 secondes
         const delaySearch = setTimeout(() => {
-            // Requête silencieuse (AJAX)
             router.get(
                 '/clients',
                 { search: searchTerm },
                 {
-                    // Garde les états
                     preserveState: true,
-                    // Empêche la page de remonter tout en haut
                     preserveScroll: true,
-                    // Remplace l'historique au lieu d'empiler, évite de devoir faire 10 fois retour sur la page
                     replace: true,
                 },
             );
         }, 300);
 
-        // destroy timer
         return () => clearTimeout(delaySearch);
     }, [searchTerm]);
 
@@ -67,7 +63,6 @@ export default function Index({
                         </p>
                     </div>
 
-                    {/* Bouton Nouveau Client */}
                     <button
                         type="button"
                         onClick={() => setShowClientForm(!showClientForm)}
@@ -78,12 +73,10 @@ export default function Index({
                     </button>
                 </div>
 
-                {/* Affichage conditionnel du formulaire Client */}
                 {showClientForm && (
                     <ClientForm onSuccess={() => setShowClientForm(false)} />
                 )}
 
-                {/* Barre de recherche */}
                 <div className="mb-6 flex items-center">
                     <div className="relative w-full max-w-sm">
                         <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -109,14 +102,12 @@ export default function Index({
                         </p>
                     </div>
                 ) : (
-                    /* Grille */
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {clients.map((client) => (
                             <div
                                 key={client.id_client}
                                 className="group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-all hover:-translate-y-1 hover:shadow-md dark:hover:border-primary/50"
                             >
-                                {/* Carte client */}
                                 <div className="p-6">
                                     <div className="mb-4 flex items-center gap-3">
                                         <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -130,7 +121,6 @@ export default function Index({
                                         </h2>
                                     </div>
 
-                                    {/* Détails */}
                                     <div className="space-y-3 text-sm">
                                         {client.website ? (
                                             <a
@@ -165,9 +155,49 @@ export default function Index({
                                             </span>
                                         </div>
                                     </div>
+
+                                    {/* affichage admin */}
+                                    {isAdmin &&
+                                        client.users &&
+                                        client.users.length > 0 && (
+                                            <div className="mt-4 border-t pt-4">
+                                                <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                                                    <Users size={14} /> Équipe
+                                                    assignée
+                                                </div>
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {client.users.map(
+                                                        (user: any) => (
+                                                            <span
+                                                                key={
+                                                                    user.id_user
+                                                                }
+                                                                className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-medium ${
+                                                                    user.pivot
+                                                                        .is_primary
+                                                                        ? 'bg-primary/10 text-primary dark:bg-primary/20'
+                                                                        : 'bg-secondary text-secondary-foreground'
+                                                                }`}
+                                                                title={
+                                                                    user.pivot
+                                                                        .is_primary
+                                                                        ? 'Titulaire du compte'
+                                                                        : 'Remplaçant / Soutien'
+                                                                }
+                                                            >
+                                                                {user.name}{' '}
+                                                                {user.pivot
+                                                                    .is_primary
+                                                                    ? '(T)'
+                                                                    : '(B)'}
+                                                            </span>
+                                                        ),
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
                                 </div>
 
-                                {/* Lien */}
                                 <div className="border-t bg-muted/20 p-4">
                                     <Link
                                         href={`/clients/${client.id_client}`}

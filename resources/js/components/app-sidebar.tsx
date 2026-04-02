@@ -1,5 +1,12 @@
-import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid, Users } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import {
+    BookOpen,
+    FolderGit2,
+    LayoutGrid,
+    Users,
+    Settings,
+    ShieldAlert,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -43,6 +50,12 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    // GET props d'HandleInertiaRequests
+    const { auth } = usePage<any>().props;
+
+    // GET statut admin
+    const isAdmin = auth.user?.is_admin || false;
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -57,8 +70,40 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
+            {/* Nav admin */}
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+                {isAdmin && (
+                    <div className="mt-4 px-2">
+                        <span className="mb-2 flex items-center gap-2 px-2 text-xs font-bold text-muted-foreground uppercase">
+                            <ShieldAlert size={14} /> Administration
+                        </span>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link
+                                        href="/admin/users"
+                                        className="text-red-500 hover:text-red-700"
+                                    >
+                                        <Users size={16} />
+                                        <span>Gérer les commerciaux</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link
+                                        href="/admin/settings"
+                                        className="text-red-500 hover:text-red-700"
+                                    >
+                                        <Settings size={16} />
+                                        <span>Paramètres CRM</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </div>
+                )}
             </SidebarContent>
 
             <SidebarFooter>
