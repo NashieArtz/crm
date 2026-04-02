@@ -7,8 +7,9 @@ import {
     Plus,
     Search,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AppLayout from '@/layouts/app-layout';
+import { ClientForm } from '@/components/client-form';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -25,6 +26,7 @@ export default function Index({
 }) {
     // Gérer ce qui est tapé dans la searchbar
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
+    const [showClientForm, setShowClientForm] = useState(false);
 
     // Exec func dès que searchTerm change
     useEffect(() => {
@@ -68,12 +70,18 @@ export default function Index({
                     {/* Bouton Nouveau Client */}
                     <button
                         type="button"
+                        onClick={() => setShowClientForm(!showClientForm)}
                         className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium whitespace-nowrap text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none"
                     >
                         <Plus size={16} />
                         Nouveau Client
                     </button>
                 </div>
+
+                {/* Affichage conditionnel du formulaire Client */}
+                {showClientForm && (
+                    <ClientForm onSuccess={() => setShowClientForm(false)} />
+                )}
 
                 {/* Barre de recherche */}
                 <div className="mb-6 flex items-center">

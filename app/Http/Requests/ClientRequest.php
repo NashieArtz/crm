@@ -36,6 +36,14 @@ class ClientRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:30'],
             'website' => ['nullable', 'string', 'max:100'],
             'income' => ['nullable', 'integer', 'min:0'],
+
+            'contacts' => 'nullable|array',
+            'contacts.*.first_name' => 'required_with:contacts|string|max:255',
+            'contacts.*.last_name' => 'required_with:contacts|string|max:255',
+            'contacts.*.email' => 'nullable|email|max:255',
+            'contacts.*.phone' => 'nullable|string|max:255',
+            'contacts.*.type' => 'required_with:contacts|string|in:lead,prospect,customer,partner',
+            'contacts.*.description' => 'nullable|string|max:255',
         ];
     }
 
