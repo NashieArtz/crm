@@ -28,6 +28,7 @@ export default function Index({
     const { auth } = usePage<any>().props;
     const isAdmin = auth.user?.is_admin || false;
 
+    // recherche reste écrite dans input (filters?.search)
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [showClientForm, setShowClientForm] = useState(false);
 
@@ -35,10 +36,12 @@ export default function Index({
         const delaySearch = setTimeout(() => {
             router.get(
                 '/clients',
+                // Send term au controller
                 { search: searchTerm },
                 {
                     preserveState: true,
                     preserveScroll: true,
+                    // No new historique
                     replace: true,
                 },
             );
