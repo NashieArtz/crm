@@ -106,7 +106,7 @@ Le fichier d'import SQL contient déjà un compte administrateur préconfiguré.
 * **Email** : admin1@crm.fr
 * **Mot de passe** : admin1234
 
-<<<<<<< Updated upstream
+
 ## Acces User
 * Email : lucas@crm.fr
 * Mot de passe : lucas1234
@@ -114,4 +114,4 @@ Le fichier d'import SQL contient déjà un compte administrateur préconfiguré.
 ## Accès Utilisateur
 * **Email** : lucas@crm.fr
 * **Mot de passe** : lucas1234
->>>>>>> Stashed changes
+

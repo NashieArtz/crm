@@ -32,14 +32,19 @@ export default function Index({
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [showClientForm, setShowClientForm] = useState(false);
 
+    // Exec func dès que searchTerm change
     useEffect(() => {
+        // Anti-rebond, éviter 50 requêtes en 1 secondes
         const delaySearch = setTimeout(() => {
+            // Requête silencieuse (AJAX)
             router.get(
                 '/clients',
                 // Send term au controller
                 { search: searchTerm },
                 {
+                    // Garde les états
                     preserveState: true,
+                    // Empêche la page de remonter tout en haut
                     preserveScroll: true,
                     // No new historique
                     replace: true,
@@ -47,6 +52,7 @@ export default function Index({
             );
         }, 300);
 
+        // destroy timer
         return () => clearTimeout(delaySearch);
     }, [searchTerm]);
 
@@ -77,10 +83,12 @@ export default function Index({
                     </button>
                 </div>
 
+                {/* Affichage conditionnel du formulaire Client */}
                 {showClientForm && (
                     <ClientForm onSuccess={() => setShowClientForm(false)} />
                 )}
 
+                {/* Barre de recherche */}
                 <div className="mb-6 flex items-center">
                     <div className="relative w-full max-w-sm">
                         <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />

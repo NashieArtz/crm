@@ -10,9 +10,12 @@ class OpportunityObserver
     /**
      * Handle the Opportunity "created" event.
      */
-    public function created(Opportunity $opportunity): void
+    public function creating(Opportunity $opportunity): void
     {
-        //
+        // definit une date par defaut
+        if (empty($opportunity->closed_date)) {
+            $opportunity->closed_date = now()->addDays(30);
+        }
     }
 
     /**
