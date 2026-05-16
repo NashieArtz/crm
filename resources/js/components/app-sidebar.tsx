@@ -1,14 +1,15 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
-    BookOpen,
-    FolderGit2,
+    Activity,
+    BarChart3,
+    Building2,
     LayoutGrid,
-    Users,
     Settings,
-    ShieldAlert,
+    ShieldCheck,
+    Users,
+    Zap,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -19,45 +20,72 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
+// nav main
+const mainNavGroups = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
+        label: 'Navigation',
+        items: [
+            {
+                title: 'Tableau de bord',
+                href: dashboard(),
+                icon: LayoutGrid,
+            },
+        ] satisfies NavItem[],
     },
     {
-        title: 'Clients',
-        href: '/clients',
-        icon: Users,
+        label: 'Commerce',
+        items: [
+            {
+                title: 'Clients',
+                href: '/clients',
+                icon: Building2,
+            },
+            {
+                title: 'Opportunités',
+                href: '/opportunities',
+                icon: Zap,
+            },
+            {
+                title: 'Activités',
+                href: '/activities',
+                icon: Activity,
+            },
+        ] satisfies NavItem[],
     },
 ];
 
-const footerNavItems: NavItem[] = [
+// nav admin
+
+const adminNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
+        title: 'Équipe commerciale',
+        href: '/admin/users',
+        icon: Users,
     },
     {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'Statistiques',
+        href: '/admin/stats',
+        icon: BarChart3,
+    },
+    {
+        title: 'Paramètres CRM',
+        href: '/admin/settings',
+        icon: Settings,
     },
 ];
 
 export function AppSidebar() {
-    // GET props d'HandleInertiaRequests
     const { auth } = usePage<any>().props;
-
-    // GET statut admin
-    const isAdmin = auth.user?.is_admin || false;
+    const isAdmin = auth.user?.is_admin === true;
 
     return (
         <Sidebar collapsible="icon" variant="inset">
+            {/* logo */}
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -70,44 +98,33 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            {/* Nav admin */}
+            {/* Navigation principale */}
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain groups={mainNavGroups} />
+
+                {/* Section admin */}
                 {isAdmin && (
-                    <div className="mt-4 px-2">
-                        <span className="mb-2 flex items-center gap-2 px-2 text-xs font-bold text-muted-foreground uppercase">
-                            <ShieldAlert size={14} /> Administration
-                        </span>
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <Link
-                                        href="/admin/users"
-                                        className="text-red-500 hover:text-red-700"
-                                    >
-                                        <Users size={16} />
-                                        <span>Gérer les commerciaux</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <Link
-                                        href="/admin/settings"
-                                        className="text-red-500 hover:text-red-700"
-                                    >
-                                        <Settings size={16} />
-                                        <span>Paramètres CRM</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    </div>
+                    <>
+                        <SidebarSeparator className="my-2" />
+                        <NavMain
+                            groups={[
+                                {
+                                    label: 'Administration',
+                                    items: adminNavItems,
+                                },
+                            ]}
+                        />
+                    </>
                 )}
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                {isAdmin && (
+                    <div className="mx-2 mb-1 flex items-center gap-1.5 rounded-md bg-amber-50 px-2 py-1.5 text-xs font-medium text-amber-700 group-data-[collapsible=icon]:hidden dark:bg-amber-950/40 dark:text-amber-400">
+                        <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+                        <span>Administrateur</span>
+                    </div>
+                )}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

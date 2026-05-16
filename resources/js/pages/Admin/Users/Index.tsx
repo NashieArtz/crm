@@ -1,19 +1,35 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { Edit, Plus, Trash2, Users } from 'lucide-react';
+import { Edit, Plus, Trash2, Users, X } from 'lucide-react';
 import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+
+// types
+interface Role {
+    id_role: number;
+    rolename: string;
+}
+
+interface User {
+    id_user: number;
+    name: string;
+    email: string;
+    role_id: number;
+    role?: Role;
+}
+
+// Composant
 
 export default function Index({
     users,
     roles,
 }: {
-    users: any[];
-    roles: any[];
+    users: User[];
+    roles: Role[];
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Administration', href: '#' },
-        { title: 'Équipe', href: '/users' },
+        { title: 'Administration', href: '/admin/users' },
+        { title: 'Équipe commerciale', href: '/admin/users' },
     ];
 
     const [isEditing, setIsEditing] = useState(false);
@@ -26,62 +42,62 @@ export default function Index({
         role_id: '',
     });
 
-    // Open l'formulaire en mode création
     const openCreate = () => {
         setIsEditing(true);
         setEditingUserId(null);
         reset();
     };
 
-    // Ouvre le formulaire en mode édition
-    const openEdit = (user: any) => {
+    const openEdit = (user: User) => {
         setIsEditing(true);
         setEditingUserId(user.id_user);
         setData({
             name: user.name,
             email: user.email,
-            // Vide ppour sécu
             password: '',
-            role_id: user.role_id,
+            role_id: String(user.role_id),
         });
+    };
+
+    const closeForm = () => {
+        setIsEditing(false);
+        setEditingUserId(null);
+        reset();
     };
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        const options = {
-            onSuccess: () => {
-                setIsEditing(false);
-                reset();
-            },
-        };
 
         if (editingUserId) {
-            put(`/users/${editingUserId}`, options);
+            put(`/admin/users/${editingUserId}`, {
+                onSuccess: closeForm,
+            });
         } else {
-            post('/users', options);
+            post('/admin/users', {
+                onSuccess: closeForm,
+            });
         }
     };
 
     const deleteUser = (userId: number) => {
         if (
-            window.confirm(
-                'Supprimer ce commercial ? Cette action est définitive.',
-            )
+            window.confirm('Supprimer ce membre ? Cette action est définitive.')
         ) {
-            router.delete(`/users/${userId}`);
+            router.delete(`/admin/users/${userId}`);
         }
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Gestion de l'équipe" />
+            <Head title="Équipe commerciale" />
 
             <div className="mx-auto w-full max-w-5xl p-6">
+                {/* En-tête */}
                 <div className="mb-6 flex items-center justify-between border-b pb-4">
                     <div>
                         <h1 className="flex items-center gap-2 text-2xl font-bold">
-                            <Users size={24} className="text-primary" /> Membres
-                            de l'équipe
+                            <Users size={24} className="text-primary" />
+                            Équipe commerciale
                         </h1>
                         <p className="text-sm text-muted-foreground">
                             Gérez les accès de vos commerciaux au CRM.
@@ -91,11 +107,12 @@ export default function Index({
                         onClick={openCreate}
                         className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                     >
-                        <Plus size={16} /> Ajouter
+                        <Plus size={16} />
+                        Ajouter un membre
                     </button>
                 </div>
 
-                {/* Form create et edit */}
+                {/* Formulaire création / édition */}
                 {isEditing && (
                     <form
                         onSubmit={submit}
@@ -109,9 +126,10 @@ export default function Index({
                             </h3>
                             <button
                                 type="button"
-                                onClick={() => setIsEditing(false)}
-                                className="text-sm text-muted-foreground hover:underline"
+                                onClick={closeForm}
+                                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
                             >
+                                <X size={14} />
                                 Annuler
                             </button>
                         </div>
@@ -127,7 +145,8 @@ export default function Index({
                                     setData('name', e.target.value)
                                 }
                                 required
-                                className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                                placeholder="Jean Dupont"
+                                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
                             />
                             {errors.name && (
                                 <p className="text-xs text-destructive">
@@ -138,7 +157,7 @@ export default function Index({
 
                         <div className="flex flex-col gap-1">
                             <label className="text-xs font-medium text-muted-foreground">
-                                Adresse Email
+                                Adresse e-mail
                             </label>
                             <input
                                 type="email"
@@ -147,7 +166,8 @@ export default function Index({
                                     setData('email', e.target.value)
                                 }
                                 required
-                                className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                                placeholder="jean@entreprise.com"
+                                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
                             />
                             {errors.email && (
                                 <p className="text-xs text-destructive">
@@ -159,8 +179,11 @@ export default function Index({
                         <div className="flex flex-col gap-1">
                             <label className="text-xs font-medium text-muted-foreground">
                                 Mot de passe{' '}
-                                {editingUserId &&
-                                    '(Laisser vide pour ne pas changer)'}
+                                {editingUserId && (
+                                    <span className="font-normal">
+                                        (laisser vide pour ne pas changer)
+                                    </span>
+                                )}
                             </label>
                             <input
                                 type="password"
@@ -169,7 +192,12 @@ export default function Index({
                                     setData('password', e.target.value)
                                 }
                                 required={!editingUserId}
-                                className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                                placeholder={
+                                    editingUserId
+                                        ? '••••••••'
+                                        : 'Minimum 8 caractères'
+                                }
+                                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
                             />
                             {errors.password && (
                                 <p className="text-xs text-destructive">
@@ -188,13 +216,16 @@ export default function Index({
                                     setData('role_id', e.target.value)
                                 }
                                 required
-                                className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                                className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:outline-none"
                             >
                                 <option value="" disabled>
                                     Sélectionner un rôle
                                 </option>
                                 {roles.map((role) => (
-                                    <option key={role.id_role} value={role.id_role}>
+                                    <option
+                                        key={role.id_role}
+                                        value={role.id_role}
+                                    >
                                         {role.rolename}
                                     </option>
                                 ))}
@@ -212,21 +243,22 @@ export default function Index({
                                 disabled={processing}
                                 className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                             >
-                                {editingUserId
-                                    ? 'Mettre à jour'
-                                    : 'Enregistrer'}
+                                {processing
+                                    ? 'Enregistrement...'
+                                    : editingUserId
+                                      ? 'Mettre à jour'
+                                      : 'Enregistrer'}
                             </button>
                         </div>
                     </form>
                 )}
 
-                {/* Tableau users */}
                 <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-                    <table className="w-full text-left text-sm text-muted-foreground">
+                    <table className="w-full text-left text-sm">
                         <thead className="bg-muted/50 text-xs text-foreground uppercase">
                             <tr>
                                 <th className="px-6 py-4">Nom</th>
-                                <th className="px-6 py-4">Email</th>
+                                <th className="px-6 py-4">E-mail</th>
                                 <th className="px-6 py-4">Rôle</th>
                                 <th className="px-6 py-4 text-right">
                                     Actions
@@ -234,6 +266,16 @@ export default function Index({
                             </tr>
                         </thead>
                         <tbody>
+                            {users.length === 0 && (
+                                <tr>
+                                    <td
+                                        colSpan={4}
+                                        className="px-6 py-8 text-center text-muted-foreground"
+                                    >
+                                        Aucun membre dans l'équipe.
+                                    </td>
+                                </tr>
+                            )}
                             {users.map((user) => (
                                 <tr
                                     key={user.id_user}
@@ -242,29 +284,41 @@ export default function Index({
                                     <td className="px-6 py-4 font-medium text-foreground">
                                         {user.name}
                                     </td>
-                                    <td className="px-6 py-4">{user.email}</td>
+                                    <td className="px-6 py-4 text-muted-foreground">
+                                        {user.email}
+                                    </td>
                                     <td className="px-6 py-4">
                                         <span
-                                            className={`rounded-full px-2 py-1 text-xs font-bold ${user.role?.rolename === 'admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}
+                                            className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                                                user.role?.rolename === 'admin'
+                                                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                                                    : user.role?.rolename === 'manager'
+                                                        ? 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400'
+                                                        : 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400'
+                                            }`}
                                         >
-                                            {user.role?.rolename || 'N/A'}
+                                            {user.role?.rolename ?? 'N/A'}
                                         </span>
                                     </td>
-                                    <td className="flex justify-end gap-3 px-6 py-4 text-right">
-                                        <button
-                                            onClick={() => openEdit(user)}
-                                            className="text-blue-500 hover:text-blue-700"
-                                        >
-                                            <Edit size={16} />
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                deleteUser(user.id_user)
-                                            }
-                                            className="text-destructive hover:text-red-700"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex items-center justify-end gap-3">
+                                            <button
+                                                onClick={() => openEdit(user)}
+                                                title="Modifier"
+                                                className="text-blue-500 hover:text-blue-700"
+                                            >
+                                                <Edit size={16} />
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    deleteUser(user.id_user)
+                                                }
+                                                title="Supprimer"
+                                                className="text-destructive hover:text-red-700"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
