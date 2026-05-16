@@ -12,12 +12,8 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
     public function __invoke(Request $request): Response
     {
-
         $user = auth()->user();
 
         $statusList = [
@@ -33,12 +29,10 @@ class DashboardController extends Controller
             'new_business',
             'upsell',
         ];
+
         $totalClient = Client::count();
 
-
-        // Requêtes pour filtrer les données si l'user n'est pas admin
         $baseClientQuery = Client::when(!$user->isAdmin(), function ($query) use ($user) {
-            // Cherche la relation pivot
             $query->whereHas('users', function ($q) use ($user) {
                 $q->where('client_user.user_id', $user->id_user);
             });
@@ -56,8 +50,8 @@ class DashboardController extends Controller
             });
         });
 
-        // Opportunities
         $totalOpportunities = Opportunity::count();
+
         $opportunityPotentialIncome = Opportunity::whereIn(
             'status',
             [
@@ -66,6 +60,7 @@ class DashboardController extends Controller
                 'qualification',
             ]
         )->sum('amount');
+
         $opportunityTotalIncome = Opportunity::whereIn('status', ['closed_won'])->sum('amount');
         $opportunityPotentialTotalIncome = $opportunityPotentialIncome + $opportunityTotalIncome;
 
@@ -73,7 +68,6 @@ class DashboardController extends Controller
         $monthlyIncome = [];
         $totalIncome = 0;
 
-        // Génération des 12 mois en array
         for ($i = 11; $i >= 0; $i--) {
             $monthDate = now()->subMonths($i);
             $monthLabel = $monthDate->format('M Y');
@@ -85,22 +79,18 @@ class DashboardController extends Controller
             ];
         }
 
-        // Requête
         $incomeDataMonth = Opportunity::where('status', 'closed_won')
             ->where('updated_at', '>=', now()->subYear())
             ->orderBy('updated_at', 'asc')
             ->get();
 
-        // Boucle sur chaque opportunités
         foreach ($incomeDataMonth as $month) {
             $monthFormat = $month->updated_at->format('M Y');
             if (isset($monthlyIncome[$monthFormat])) {
-                // Montant du mois en cours
                 $monthlyIncome[$monthFormat]['amount'] += (float) $month->amount;
             }
         }
-        // Cumulation du montant
-        // Pointeur directe vers la mémoire
+
         foreach ($monthlyIncome as &$data) {
             $totalIncome += $data['amount'];
             $data['total'] = $totalIncome;
@@ -111,7 +101,6 @@ class DashboardController extends Controller
         // <editor-fold desc="INCOME PER WEEK OVER 6 MONTHS">
         $weeklyIncome = [];
 
-        // Génération des semaines
         for ($i = 25; $i >= 0; $i--) {
             $weekDate = now()->subWeeks($i);
             $weekNum = $weekDate->format('W');
@@ -143,6 +132,7 @@ class DashboardController extends Controller
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
+
         $incomePerDayPerWeek = $incomeDataWeek->map(fn($item) => [
             'day' => date('d/m', strtotime($item->date)),
             'amount' => (float) $item->total,
@@ -153,16 +143,14 @@ class DashboardController extends Controller
         $incomeDataMonth = Opportunity::where('status', 'closed_won')
             ->where('updated_at', '>=', now()->subDays(30))
             ->select([
-                // DATE() keeps the date only
                 DB::raw('DATE(updated_at) as date'),
                 DB::raw('SUM(amount) as total'),
             ])
-            // Regroupage des montants par date
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
+
         $incomePerDayPerMonth = $incomeDataMonth->map(fn($item) => [
-            // Format day-Month
             'day' => date('d-M', strtotime($item->date)),
             'amount' => (float) $item->total,
         ]);
@@ -178,7 +166,6 @@ class DashboardController extends Controller
         //<editor-fold desc="LAST OPP DEPENDING ON STATUS/TYPE">
         $latestOpportunitiesByOption = Opportunity::query()
             ->when($request->input('status'), function ($query, $status) use ($statusList) {
-                // Comparaison du tableau avec données valables et tableaux en requête
                 $statuses = array_intersect((array) $status, $statusList);
 
                 if (! empty($statuses)) {
@@ -198,12 +185,12 @@ class DashboardController extends Controller
             ->get();
         //</editor-fold>
 
-        // Dernières activités
-        $latestActivities = Activity::latest()->limit(10)->get();
-
+        $latestActivities = Activity::with('clients:id_client,company_name')
+            ->latest()
+            ->limit(10)
+            ->get();
 
         //<editor-fold desc="Piechart (nom, value) des opportunities par types">
-        // clone pour ne pas modifier dans BDD/mémoire
         $baseWonQuery = (clone $baseOppQuery)->where('status', 'closed_won');
         $oppBySegments = (clone $baseWonQuery)
             ->select([
@@ -213,11 +200,10 @@ class DashboardController extends Controller
             ])
             ->groupBy('type')
             ->get()
-            // boucle sur chaque item de get()
             ->map(fn($item) => [
-                // ucfirst() -> upper case first
                 'name' => ucfirst(str_replace('_', ' ', $item->type)),
                 'value' => (float) $item->total_amount,
+                'total' => (float) $item->total_amount,
             ]);
         //</editor-fold>
 
@@ -238,15 +224,27 @@ class DashboardController extends Controller
             ]);
         //</editor-fold>
 
+        $conversionRate = $totalClient > 0
+            ? round(((clone $baseOppQuery)->where('status', 'closed_won')->count() / $totalClient) * 100, 1)
+            : 0;
 
-        // Envoi des données vers dashboard
+        $stats = [
+            'total_clients' => $totalClient,
+            'active_opportunities' => (clone $baseOppQuery)->whereNotIn('status', ['closed_won', 'closed_lost'])->count(),
+            'total_revenue' => $opportunityTotalIncome,
+            'conversion_rate' => $conversionRate,
+        ];
+
         return Inertia::render('dashboard', [
+            'stats' => $stats,
+            'salesData' => array_values($monthlyIncome),
+            'opportunityStats' => $oppBySegments,
+            'recentActivities' => $latestActivities,
+
             'totalClient' => $totalClient,
             'totalOpportunities' => $totalOpportunities,
-
             'incomePerDayPerWeek' => $incomePerDayPerWeek,
             'incomePerDayPerMonth' => $incomePerDayPerMonth,
-
             'incomeData' => [
                 'monthlyIncome' => array_values($monthlyIncome),
                 'weeklyIncome' => array_values($weeklyIncome),
@@ -254,11 +252,9 @@ class DashboardController extends Controller
             'opportunityPotentialIncome' => $opportunityPotentialIncome,
             'opportunityTotalIncome' => $opportunityTotalIncome,
             'opportunityPotentialTotalIncome' => $opportunityPotentialTotalIncome,
-
             'latestOpportunities' => $latestOpportunities,
             'latestOpportunitiesByOption' => $latestOpportunitiesByOption,
-            'latestActivities' => $latestActivities,
-
+            'latestActivitiesData' => $latestActivities,
             'oppBySegments' => $oppBySegments,
             'topAccounts' => $topAccounts,
         ]);
